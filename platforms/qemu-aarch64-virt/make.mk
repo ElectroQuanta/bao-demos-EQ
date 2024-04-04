@@ -21,6 +21,22 @@ $(atf-fip): $(uboot_image) $(atf_src)
 	dd if=$(atf_src)/build/qemu/release/fip.bin of=$(atf-fip) seek=64 bs=4096 conv=notrunc
 
 
+# atf_repo:=https://github.com/bao-project/arm-trusted-firmware.git
+# atf_src:=$(wrkdir_src)/arm-trusted-firmware-$(ARCH)
+# atf_version:=bao/demo
+# atf_plat:=qemu
+# atf_targets:=bl1 fip 
+# atf_flags+=BL33=$(wrkdir_plat_imgs)/u-boot.bin
+# atf_flags+=QEMU_USE_GIC_DRIVER=QEMU_GICV3
+#
+# make -C $(wrkdir_src)/arm-trusted-firmware-$(ARCH) PLAT=qemu bl1 fip
+# BL33=$(wrkdir_plat_imgs)/u-boot.bin QEMU_USE_GIC_DRIVER=QEMU_GICV3
+# dd if=$(atf_src)/build/qemu/release/bl1.bin of=$(atf-fip)
+# dd if=$(atf_src)/build/qemu/release/fip.bin of=$(atf-fip) seek=64 bs=4096 conv=notrunc
+
+$(atf_src):
+	git clone --depth 1 --branch $(atf_version) $(atf_repo) $(atf_src)
+
 platform: $(bao_image) $(atf-fip) 
 
 instuctions:=$(bao_demos)/platforms/$(PLATFORM)/README.md
@@ -34,6 +50,5 @@ run: qemu platform
 		-device virtio-net-device,netdev=net0\
 		-netdev user,id=net0,net=192.168.42.0/24,hostfwd=tcp:127.0.0.1:5555-:22\
 		-device virtio-serial-device -chardev pty,id=serial3 -device virtconsole,chardev=serial3
-	
 
 .PHONY: run

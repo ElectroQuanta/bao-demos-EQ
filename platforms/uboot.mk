@@ -14,3 +14,11 @@ $(strip $1): $(uboot_src)
 endef
 
 u-boot: $(wrkdir_plat_imgs)/u-boot.bin
+
+###
+# git clone --depth 1 --branch $(uboot_version) $(uboot_repo) $(uboot_src)
+# $(MAKE) -C $(uboot_src) qemu_arm64_defconfig
+# echo "CONFIG_SYS_TEXT_BASE=0x60000000\nCONFIG_TFABOOT=y\n" >> uboot_src:=$(wrkdir_src)/u-boot
+# $(MAKE) -C $(uboot_src) -j$(nproc) 
+# cp $(uboot_src)/u-boot.bin $$@
+

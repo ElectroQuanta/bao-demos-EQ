@@ -1,1 +1,3 @@
-wrkdir*
+wrkdir/
+*~undo-tree~
+env.txt
