@@ -93,7 +93,7 @@ atf_build() {
     print_info "...................... ATF ................... "
 
     # Cloning repo
-    if [ "$1" == "deep" ] ; then
+    if [ "$1" = "deep" ] ; then
 	echo "Removing previous build..."
 	rm -rf "$BAO_DEMOS_ATF" || true
     fi
