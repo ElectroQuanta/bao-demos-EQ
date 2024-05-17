@@ -148,7 +148,7 @@ esac
 
 # Saving variables for run script
 ENV_FILE="$BASH_MAIN/scripts/env.txt"
-rm $ENV_FILE # remove file before each run
+rm $ENV_FILE | true # remove file before each run
 
 save_var_to_file "CROSS_COMPILE" "$CROSS_COMPILE" "$ENV_FILE"
 save_array_to_file "DEMOS" "$ENV_FILE"
@@ -186,7 +186,7 @@ export BAO_DEMOS_WRKDIR_IMGS=$BAO_DEMOS_WRKDIR_PLAT/$DEMO
 
 if [ -d "$BAO_DEMOS_WRKDIR" ]; then
     print_info ">> Removing previous working directory"
-    rm -rf "$BAO_DEMOS_WRKDIR"
+    rm -rf "$BAO_DEMOS_WRKDIR" | true
 fi
 
 create_dir "$BAO_DEMOS_WRKDIR"
