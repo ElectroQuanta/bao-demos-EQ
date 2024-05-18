@@ -41,13 +41,14 @@
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 echo "$script_dir"
 
-export BASH_MAIN=$(realpath "$script_dir/..")
+BASH_MAIN=$(realpath "$script_dir/..")
+export BASH_MAIN
 echo "$BASH_MAIN"
 
 # Obtain additional utility functions
 source_helper(){
     # local help_script=$1
-    source $(realpath "$1")
+    source "$(realpath "$1")"
     if [ ! $? -eq 0 ]; then
 	print_error "Could not find helper script $1"
 	print_error "Aborting..."
@@ -64,10 +65,13 @@ ignore_error=false # dont ignore bash commands errors
 # Toolchain
 print_info "======================================"
 print_info ">>> Toolchain setup ................."
-export TOOLCHAIN_PATH=$(realpath "$BASH_MAIN/../Toolchains/arm/arm-gnu-toolchain-12.3.rel1-x86_64-aarch64-none-elf")
+TOOLCHAIN_PATH=$(realpath "$BASH_MAIN/../Toolchains/arm/arm-gnu-toolchain-12.3.rel1-x86_64-aarch64-none-elf")
+export TOOLCHAIN_PATH
 echo "$TOOLCHAIN_PATH"
-export TOOLCHAIN_PREFIX=aarch64-none-elf-
-export CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
+TOOLCHAIN_PREFIX=aarch64-none-elf-
+export TOOLCHAIN_PREFIX
+CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
+export CROSS_COMPILE
 cross_compile_gcc="$CROSS_COMPILE""gcc"
 # Test cross compilation toolchain without echoing its output to the terminal
 $cross_compile_gcc --version >/dev/null 2>&1 # if errors, it exits
@@ -135,10 +139,10 @@ export BUILD_TYPE=${BUILD_TYPES[$build_type_index]} # Build Type
 
 # setup arch according to Appendix I
 case "$PLATFORM" in 
-    ${PLATFORMS[10]})
+    "${PLATFORMS[10]}")
 	export ARCH=${ARCHS[2]} # riscv64
 	;;
-    ${PLATFORMS[8]} | ${PLATFORMS[9]})
+    "${PLATFORMS[8]}" | "${PLATFORMS[9]}")
 	export ARCH=${ARCHS[1]} # aarch32
 	;;
     *)
@@ -149,7 +153,7 @@ esac
 
 # Saving variables for run script
 ENV_FILE="$BASH_MAIN/scripts/env.txt"
-rm $ENV_FILE | true # remove file before each run
+rm "$ENV_FILE" || true # remove file before each run
 
 save_var_to_file "CROSS_COMPILE" "$CROSS_COMPILE" "$ENV_FILE"
 save_array_to_file "DEMOS" "$ENV_FILE"
@@ -186,13 +190,14 @@ export BAO_DEMOS_WRKDIR_PLAT=$BAO_DEMOS_WRKDIR/imgs/$PLATFORM
 export BAO_DEMOS_WRKDIR_IMGS=$BAO_DEMOS_WRKDIR_PLAT/$DEMO
 
 # Prompt user to remove previous build
+ignore_error=true
 print_info "Remove previous build?"
 get_user_choice "${YES_NO_OPTS[@]}"
 answer_index=$?
 if [ $answer_index -eq 0 ]; then # yes
     if [ -d "$BAO_DEMOS_WRKDIR" ]; then
 	print_info ">> Removing previous working directory"
-	rm -rf "$BAO_DEMOS_WRKDIR" | true
+	rm -rf "$BAO_DEMOS_WRKDIR" || true
     fi
 fi
 
