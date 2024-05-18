@@ -85,7 +85,12 @@ case "$PLATFORM" in
 	echo "3"
 	;;
     ${PLATFORMS[4]})
-	echo "4"
+	print_info ">> Deploy RPi4"
+
+	helper_script="$BASH_MAIN/scripts/platforms/rpi4.sh"
+	source_helper $helper_script
+
+	sdcard_deploy
 	;;
     ${PLATFORMS[5]})
 	helper_script="$BASH_MAIN/scripts/platforms/qemu_aarch64_virt.sh"

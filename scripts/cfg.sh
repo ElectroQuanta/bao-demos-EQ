@@ -80,6 +80,7 @@ DEMOS=("baremetal" "linux+freertos" "linux+zephyr" "zephyr+baremetal" "linux" "l
 PLATFORMS=("zcu102" "zcu104" "imx8qm" "tx2" "rpi4" "qemu-aarch64-virt" "fvp-a-aarch64" "fvp-a-aarch32" "fvp-r-aarch64" "fvp-r-aarch32" "qemu-riscv64-virt" "bb-ai-64" "imx8mn-ddr3l-evk")
 ARCHS=("aarch64" "aarch32" "riscv64")
 BUILD_TYPES=("auto" "manual-full" "manual-step")
+YES_NO_OPTS=("yes" "no" "quit")
 
 # Request user input for demo
 print_info "========== Select Demo =========="
@@ -184,9 +185,15 @@ export BAO_DEMOS_WRKDIR_BIN=$BAO_DEMOS_WRKDIR/bin
 export BAO_DEMOS_WRKDIR_PLAT=$BAO_DEMOS_WRKDIR/imgs/$PLATFORM
 export BAO_DEMOS_WRKDIR_IMGS=$BAO_DEMOS_WRKDIR_PLAT/$DEMO
 
-if [ -d "$BAO_DEMOS_WRKDIR" ]; then
-    print_info ">> Removing previous working directory"
-    rm -rf "$BAO_DEMOS_WRKDIR" | true
+# Prompt user to remove previous build
+print_info "Remove previous build?"
+get_user_choice "${YES_NO_OPTS[@]}"
+answer_index=$?
+if [ $answer_index -eq 0 ]; then # yes
+    if [ -d "$BAO_DEMOS_WRKDIR" ]; then
+	print_info ">> Removing previous working directory"
+	rm -rf "$BAO_DEMOS_WRKDIR" | true
+    fi
 fi
 
 create_dir "$BAO_DEMOS_WRKDIR"
