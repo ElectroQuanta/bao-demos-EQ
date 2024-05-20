@@ -249,9 +249,9 @@ copy_files() {
     print_info ">> Bootloader and firmware"
     sudo cp -v -rf $BAO_DEMOS_WRKDIR_PLAT/firmware/boot/* $BAO_DEMOS_SDCARD
     sudo cp -v $BAO_DEMOS/platforms/rpi4/config.txt $BAO_DEMOS_SDCARD
-    sudo cp -v $BAO_DEMOS_WRKDIR_PLAT/bl31.bin $BAO_DEMOS_SDCARD
-    sudo cp -v $BAO_DEMOS_WRKDIR_PLAT/u-boot.bin $BAO_DEMOS_SDCARD
-    sudo cp -v $BAO_DEMOS_WRKDIR_IMGS/bao.bin $BAO_DEMOS_SDCARD
+    sudo cp -v $BAO_DEMOS_WRKDIR_PLAT/* $BAO_DEMOS_SDCARD
+    # sudo cp -v $BAO_DEMOS_WRKDIR_PLAT/u-boot.bin $BAO_DEMOS_SDCARD
+    # sudo cp -v $BAO_DEMOS_WRKDIR_IMGS/bao.bin $BAO_DEMOS_SDCARD
 }
 
 print_next_steps() {
