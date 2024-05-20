@@ -16,7 +16,7 @@ get_rpi4_fw() {
     print_info "====== Get RPI4 firmware"
     export BAO_DEMOS_FW=$BAO_DEMOS_WRKDIR_PLAT/firmware
     firmware_version="1.20230405" # withdrawn from rpi4/make.mk
-    git clone https://github.com/raspberrypi/firmware.git $BAO_DEMOS_FW\
+    git clone https://github.com/raspberrypi/firmware.git "$BAO_DEMOS_FW"\
 	--depth 1 --branch "$firmware_version"
 }
 
@@ -39,7 +39,7 @@ uboot_build() {
     clone_repo "$repo" "$msg" "$cmd"
 
     ignore_error=false
-    cd $BAO_DEMOS_UBOOT
+    cd "$BAO_DEMOS_UBOOT" || echo "Missing UBoot folder..." && exit
     print_info "========================== "
 
     # Make config
@@ -55,7 +55,7 @@ uboot_build() {
     # Copying bin to image dir
     print_info "====== Copying the U-Boot binary into the final image directory"
     ignore_error=false
-    cp -v $BAO_DEMOS_UBOOT/u-boot.bin $BAO_DEMOS_WRKDIR_PLAT
+    cp -v "$BAO_DEMOS_UBOOT/u-boot.bin" "$BAO_DEMOS_WRKDIR_PLAT"
     print_info "======================================"
 }
 
@@ -73,11 +73,12 @@ atf_build() {
 	    $BAO_DEMOS_ATF --branch bao/demo --depth 1"
     clone_repo "$repo" "$msg" "$cmd"
     
-    cd "$repo"
+    cd "$repo" || echo "Missing ATF folder..." && exit
     make PLAT=rpi4
 
     # copy image to the platform's working directory
-    cp -v $BAO_DEMOS_ATF/build/rpi4/release/bl31.bin $BAO_DEMOS_WRKDIR_PLAT
+    cp -v "$BAO_DEMOS_ATF/build/rpi4/release/bl31.bin" \
+       "$BAO_DEMOS_WRKDIR_PLAT"
 }
 
 
@@ -105,8 +106,8 @@ check_requirements() {
 
     print_info ">> Setting SD card partition"
     # Read the user's choice
-    read -p "Enter the /dev/sdX partition (full): " answer
-    if ls $answer >/dev/null 2>&1; then
+    read -rp "Enter the /dev/sdX partition (full): " answer
+    if ls "$answer" >/dev/null 2>&1; then
 	SD_DEVICE="$answer"
 	print_info "SD device $answer found..."
 	unmount_partitions "$SD_DEVICE"
@@ -169,7 +170,42 @@ create_partition_fdisk(){
 
     local target_device="$1"
     print_info "====== Create Partition"
-    echo -e "o\nn\np\n\n\n16384\n\na\nt\nc\nw\n" | sudo fdisk "$target_device"
+
+    # echo -e "o\nn\np\n\n16384\n\na\nt\nc\nw\n" | sudo fdisk "$target_device"
+
+
+# Table 1 layout
+# Bootloader (RAW partition) - should be copied using fdisk
+#raw_start_sectors=64
+#raw_size_sectors=20416
+# FAT32 partition (boot partition)
+fat_start_sectors=16384
+fat_size=500M
+# Root partition
+ext4_start_sectors=1228800
+
+# Remove any vfat signatures that may exist
+sudo wipefs -a "$target_device"1
+sudo wipefs -a "$target_device"2
+    
+sudo fdisk "$target_device" <<EOF
+o
+n
+p
+1
+$fat_start_sectors
++${fat_size}
+t
+0c
+a
+n
+p
+2
+$ext4_start_sectors
+
+p
+w
+EOF
     print_info "=================================================="
 }
 
@@ -223,10 +259,10 @@ EOF
 }
 
 format_partition() {
-    local target_partition="$1"
+    local target_partition="${1}1"
     # Format partitions
     print_info "==== Format partition"
-    sudo mkfs.fat "$target_partition" -n BOOT
+    sudo mkfs.fat -v "$target_partition" -n BOOT
     print_info "=================================================="
 }
 
@@ -293,9 +329,21 @@ sdcard_deploy() {
 
     check_requirements
 
-    create_partition_sfdisk "$SD_DEVICE"
-
-    format_partition "$SD_DEVICE"
+    print_info "Format partitions?"
+    get_user_choice "${YES_NO_OPTS[@]}"
+    answer_index=$?
+    case "$answer_index" in 
+	0) # yes
+	    #create_partition_sfdisk "$SD_DEVICE"
+	    create_partition_fdisk "$SD_DEVICE"
+	    format_partition "$SD_DEVICE"
+	    ;;
+	1) # no
+	    ;;
+	*)
+	    print_info "Quitting..."
+	    exit 1
+    esac
 
     # Copy files
     copy_files "$SD_DEVICE"
@@ -306,3 +354,6 @@ sdcard_deploy() {
     print_next_steps
 
 }
+
+#"o\nn\np\n\n16384\n\na\nt\nc\nw\n"
+#"o\nn\np\n\n16384\n\na\nt\nc\nw\n"

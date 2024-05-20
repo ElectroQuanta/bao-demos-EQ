@@ -213,7 +213,7 @@ get_user_choice() {
         echo "$((i+1)). ${options_array[i]}"
     done
 
-    read -p "Enter the option number: " user_choice
+    read -rp "Enter the option number: " user_choice
 
     # Trim leading and trailing whitespace
     # The conditional statement checks two conditions:
@@ -225,7 +225,7 @@ get_user_choice() {
 
     if [[ -n "$user_choice" && "$user_choice" =~ ^[0-9]+$ ]]; then
 	local index=$((user_choice - 1))
-	if [ "$index" -ge 0 ] && [ "$index" -lt $num_options ]; then
+	if [ "$index" -ge 0 ] && [ "$index" -lt "$num_options" ]; then
 	    return $index
 	fi
     fi
