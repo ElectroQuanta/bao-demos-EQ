@@ -26,13 +26,14 @@
 #  */
 
 bt="$1"
+patches="$2"
 
 # Set script absolute path
 script_dir="$(cd "$(dirname "$0")" && pwd)"
-echo "$script_dir"
-
-export BASH_MAIN=$(realpath "$script_dir/..")
-echo "$BASH_MAIN"
+#echo "$script_dir"
+BASH_MAIN=$(realpath "$script_dir/..")
+export BASH_MAIN
+#echo "$BASH_MAIN"
 
 # Obtain additional utility functions
 source_helper(){
@@ -54,14 +55,14 @@ setup_env
 # Check if Build type is auto
 # setup arch according to Appendix I
 case "$BUILD_TYPE" in 
-    ${BUILD_TYPES[0]}) # auto
+    "${BUILD_TYPES[0]}") # auto
 	print_info "====== Automatic Build ..."
 	make_cmd="make -j$(nproc)"
 	run_make_cmd "$make_cmd"
 	print_info "======================================"
 	exit
 	;;
-    ${BUILD_TYPES[2]}) # manual step-by-step
+    "${BUILD_TYPES[2]}") # manual step-by-step
 	print_info ">> Manual step-by-step"
 	echo "Run each script separately:"
 	echo "- build_guests"
@@ -75,11 +76,11 @@ esac
 
 
 ################## Build Guests ########################
-source "$BASH_MAIN/scripts/build_guests.sh" "$bt"
+source "$BASH_MAIN/scripts/build_guests.sh" "$bt" "$patches"
 
 ################# Build Bao ##########################
 source "$BASH_MAIN/scripts/build_bao.sh" "$bt"
 
-################# Build Bao ##########################
+################# Build Boot ##########################
 source "$BASH_MAIN/scripts/build_boot.sh" "$bt"
 

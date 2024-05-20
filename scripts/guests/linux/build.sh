@@ -40,22 +40,23 @@ setup_linux_kernel(){
 
     if [ ! -d "$BAO_DEMOS_LINUX_SRC" ]; then
 	print_info "Cloning $BAO_DEMOS_LINUX_VERSION into $BAO_DEMOS_LINUX_SRC: branch $branch"
-	git clone $BAO_DEMOS_LINUX_REPO $BAO_DEMOS_LINUX_SRC --depth 1\
+	git clone $BAO_DEMOS_LINUX_REPO "$BAO_DEMOS_LINUX_SRC" --depth 1\
 	    --branch $BAO_DEMOS_LINUX_VERSION
     fi
     
     # Apply patches
     if [ "$patches" == "1" ] ; then
 	print_info ">> Applying kernel patches..."
-	cd $BAO_DEMOS_LINUX_SRC
-	git apply $BAO_DEMOS_LINUX/patches/$BAO_DEMOS_LINUX_VERSION/*.patch
+	cd "$BAO_DEMOS_LINUX_SRC" || echo "Missing $BAO_DEMOS_LINUX_SRC" & exit
+	git apply "$BAO_DEMOS_LINUX/patches/$BAO_DEMOS_LINUX_VERSION/*.patch"
     fi
 
     # Finally, setup and environment variable pointing to the target architecture and 
     # platform specific config to be used by buildroot:
-    export BAO_DEMOS_LINUX_CFG_FRAG=$(ls $BAO_DEMOS_LINUX/configs/base.config\
-					 $BAO_DEMOS_LINUX/configs/$ARCH.config\
-					 $BAO_DEMOS_LINUX/configs/$PLATFORM.config 2> /dev/null)
+    BAO_DEMOS_LINUX_CFG_FRAG=$(ls "$BAO_DEMOS_LINUX/configs/base.config"\
+					 "$BAO_DEMOS_LINUX/configs/$ARCH.config"\
+					 "$BAO_DEMOS_LINUX/configs/$PLATFORM.config" 2> /dev/null)
+    export BAO_DEMOS_LINUX_CFG_FRAG
 }
 
 buildroot_build(){
@@ -83,7 +84,7 @@ buildroot-$ARCH-$BAO_DEMOS_LINUX_VERSION"
 	git clone $repo $BAO_DEMOS_BUILDROOT --depth 1\
 	    --branch $branch
     fi
-    cd $BAO_DEMOS_BUILDROOT
+    cd "$BAO_DEMOS_BUILDROOT" || echo "Missing $BAO_DEMOS_BUILDROOT" & return 1
 
 
     if [ "$bt" == "clean" ] ; then
@@ -97,17 +98,17 @@ buildroot-$ARCH-$BAO_DEMOS_LINUX_VERSION"
 	# and build:
 	ignore_error=false
 	print_info "====== Build Buildroot"
-	make defconfig BR2_DEFCONFIG=$BAO_DEMOS_BUILDROOT_DEFCFG
+	make defconfig BR2_DEFCONFIG="$BAO_DEMOS_BUILDROOT_DEFCFG"
 	print_info "$BR2_DEFCONFIG"
-	read -p "Press to build buildroot: " user_input
+	read -rp "Press to build buildroot: " user_input
 	# Building
 	ignore_error=true
 	make_cmd="make linux-reconfigure all"
 	run_make_cmd "$make_cmd"
 
 	ignore_error=false
-	mv $BAO_DEMOS_BUILDROOT/output/images/Image\
-	   $BAO_DEMOS_BUILDROOT/output/images/Image-$PLATFORM
+	mv "$BAO_DEMOS_BUILDROOT/output/images/Image"\
+	   "$BAO_DEMOS_BUILDROOT/output/images/Image-$PLATFORM"
     fi
 }
 
@@ -126,13 +127,13 @@ wrap_kernel_dtb(){
     # *linux.dts* define a virtual machine variable:
     export BAO_DEMO_LINUX_VM=linux
 
-    make -C $BAO_DEMOS_LINUX/lloader clean || true
+    make -C "$BAO_DEMOS_LINUX/lloader clean" || true
 
     # Then build:
     ignore_error=false
     print_info "======== Building device tree"
-    dtc $BAO_DEMOS/demos/$DEMO/devicetrees/$PLATFORM/$BAO_DEMO_LINUX_VM.dts >\
-	$BAO_DEMOS_WRKDIR_IMGS/$BAO_DEMO_LINUX_VM.dtb
+    dtc "$BAO_DEMOS/demos/$DEMO/devicetrees/$PLATFORM/$BAO_DEMO_LINUX_VM.dts" >\
+	"$BAO_DEMOS_WRKDIR_IMGS/$BAO_DEMO_LINUX_VM.dtb"
 
     # Wrap the kernel image and device tree blob in a single binary:
     print_info "======== Wrap kernel image and device tree blob into a single binary"
@@ -158,7 +159,7 @@ linux_build() {
     print_info "Requirements: cpio, unzip, dtc"
 
     # setup linux kernel build_type{deep, clean, nil} patches{1,0}
-    setup_linux_kernel "$bt" 0
+    setup_linux_kernel "$bt" 1
     #setup_linux_kernel deep 0
 
     # Build linux system (kernel + filesystem) with buildroot build_type{deep, clean, nil}

@@ -37,27 +37,36 @@
 # clone_repo "$repo" "$msg" "$cmd"
 # cd "$repo"
 
-# Set script absolute path
-script_dir="$(cd "$(dirname "$0")" && pwd)"
-echo "$script_dir"
+# Function to check if the script is sourced or executed
+is_sourced() {
+    [[ "${BASH_SOURCE[0]}" != "$0" ]]
+}
+
+# Determine script directory
+if is_sourced; then
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+    script_dir="$(cd "$(dirname "$0")" && pwd)"
+fi
+echo "Script directory: $script_dir"
 
 BASH_MAIN=$(realpath "$script_dir/..")
 export BASH_MAIN
-echo "$BASH_MAIN"
+echo "BASH_MAIN: $BASH_MAIN"
 
-# Obtain additional utility functions
-source_helper(){
-    # local help_script=$1
-    source "$(realpath "$1")"
-    if [ ! $? -eq 0 ]; then
-	print_error "Could not find helper script $1"
-	print_error "Aborting..."
-	exit
+# Function to source helper scripts
+source_helper() {
+    local help_script=$1
+    if ! source "$(realpath "$help_script")"; then
+        echo "Error: Could not find or source helper script $help_script"
+        echo "Aborting..."
+        return 1  # Use return instead of exit
     fi
-    print_info "Sourced: $1"
+    echo "Sourced: $help_script"
 }
-# source_helper "$helper_script"
-source_helper "$BASH_MAIN/scripts/utils.sh"
+
+# Source the helper script
+source_helper "$BASH_MAIN/scripts/utils.sh" || exit 1
 
 ignore_error=false # dont ignore bash commands errors
 ###
@@ -92,7 +101,8 @@ get_user_choice "${DEMOS[@]}"
 demo_index=$?
 if [ $demo_index -eq 255 ]; then
     print_error "Invalid choice. Exiting."
-    exit 1
+    return 1
+    # exit 1
 fi
 print_info "======================================"
 echo ""
@@ -103,7 +113,8 @@ get_user_choice "${PLATFORMS[@]}"
 plat_index=$?
 if [ $plat_index -eq 255 ]; then
     print_error "Invalid choice. Exiting."
-    exit 1
+    return 1
+    #exit 1
 fi
 print_info "======================================"
 echo ""
@@ -114,7 +125,8 @@ get_user_choice "${BUILD_TYPES[@]}"
 build_type_index=$?
 if [ $build_type_index -eq 255 ]; then
     print_error "Invalid choice. Exiting."
-    exit 1
+    #exit 1
+    return 1
 fi
 print_info "======================================"
 echo ""

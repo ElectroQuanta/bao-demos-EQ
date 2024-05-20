@@ -26,10 +26,12 @@
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 echo "$script_dir"
 
-export BASH_MAIN=$(realpath "$script_dir/..")
+BASH_MAIN=$(realpath "$script_dir/..")
+export BASH_MAIN
 echo "$BASH_MAIN"
 
 bt="$1"
+patches="$2"
 
 # Obtain additional utility functions
 source_helper(){
@@ -52,43 +54,43 @@ setup_env
 print_info "=================================="
 print_info "............... Building guests for DEMO = $DEMO ............"
 case "$DEMO" in
-    ${DEMOS[0]})
+    "${DEMOS[0]}")
 	helper_script="$BASH_MAIN/scripts/demos/baremetal/build.sh"
-	source_helper $helper_script
+	source_helper "$helper_script"
 
 	baremetal_build "$bt"
 	# ---
 	;;
-    ${DEMOS[1]})
+    "${DEMOS[1]}")
 	helper_script="$BASH_MAIN/scripts/demos/linux+freertos/build.sh"
-	source_helper $helper_script
+	source_helper "$helper_script"
 
 	freertos_build "$bt"
-	linux_build "$bt"
+	linux_build "$bt" "$patches"
 	;;
-    ${DEMOS[2]})
+    "${DEMOS[2]}")
 	helper_script="$BASH_MAIN/scripts/demos/linux+zephyr/build.sh"
-	source_helper $helper_script
+	source_helper "$helper_script"
 
-	zephyr_build "$1$"
+	zephyr_build "$1"
 	linux_build "$1"
 	;;
-    ${DEMOS[3]})
+    "${DEMOS[3]}")
 	echo "${DEMOS[3]})"
 	;;
-    ${DEMOS[4]})
+    "${DEMOS[4]}")
 	helper_script="$BASH_MAIN/scripts/demos/linux/build.sh"
-	source_helper $helper_script
+	source_helper "$helper_script"
 
 	linux_build "$bt"
 	;;
-    ${DEMOS[5]})
+    "${DEMOS[5]}")
 	echo "${DEMOS[5]})"
 	;;
     *)
 	echo "Unrecognized!!! Aborting..."
-	exit
+	return 1
 	;;
 esac
 
-cd "$BASH_MAIN"
+cd "$BASH_MAIN" || echo "Missing $BASH_MAIN" & return 1
