@@ -305,8 +305,13 @@ setup_env() {
     export BAO_DEMOS_WRKDIR_PLAT=$BAO_DEMOS_WRKDIR/imgs/$PLATFORM
     export BAO_DEMOS_WRKDIR_IMGS=$BAO_DEMOS_WRKDIR_PLAT/$DEMO
 
+    print_env
+}
+
+print_env(){
     print_info "======================================"
     print_info "............... Environment info ................."
+    print_info "CROSS_COMPILE: $CROSS_COMPILE"
     print_info "PLATFORM: $PLATFORM"
     print_info "DEMO: $DEMO"
     print_info "ARCH: $ARCH"

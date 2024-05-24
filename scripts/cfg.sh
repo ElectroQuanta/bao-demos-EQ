@@ -37,6 +37,36 @@
 # clone_repo "$repo" "$msg" "$cmd"
 # cd "$repo"
 
+
+save_env(){
+    export BASH_MAIN
+    export CROSS_COMPILE PLATFORM DEMO ARCH BUILD_TYPE
+    export BAO_DEMOS BAO_DEMOS_WRKDIR BAO_DEMOS_WRKDIR_SRC
+    export BAO_DEMOS_WRKDIR_BIN BAO_DEMOS_WRKDIR_PLAT BAO_DEMOS_WRKDIR_IMGS
+
+
+    save_var_to_file "CROSS_COMPILE" "$CROSS_COMPILE" "$ENV_FILE"
+    save_array_to_file "DEMOS" "$ENV_FILE"
+    save_array_to_file "PLATFORMS" "$ENV_FILE"
+    save_array_to_file "ARCHS" "$ENV_FILE"
+    save_array_to_file "BUILD_TYPES" "$ENV_FILE"
+
+    save_var_to_file "RUN_DIR" "$RUN_DIR" "$ENV_FILE"
+
+    save_var_to_file "PLATFORM" "$PLATFORM" "$ENV_FILE"
+    save_var_to_file "DEMO" "$DEMO" "$ENV_FILE"
+    save_var_to_file "ARCH" "$ARCH" "$ENV_FILE"
+    save_var_to_file "BUILD_TYPE" "$BUILD_TYPE" "$ENV_FILE"
+
+
+    echo "BAO_DEMOS=\"$BAO_DEMOS\"" >> "$ENV_FILE"
+    echo "BAO_DEMOS_WRKDIR=\"$BAO_DEMOS_WRKDIR\"" >> "$ENV_FILE"
+    echo "BAO_DEMOS_WRKDIR_SRC=\"$BAO_DEMOS_WRKDIR_SRC\"" >> "$ENV_FILE"
+    echo "BAO_DEMOS_WRKDIR_BIN=\"$BAO_DEMOS_WRKDIR_BIN\"" >> "$ENV_FILE"
+    echo "BAO_DEMOS_WRKDIR_PLAT=\"$BAO_DEMOS_WRKDIR_PLAT\"" >> "$ENV_FILE"
+    echo "BAO_DEMOS_WRKDIR_IMGS=\"$BAO_DEMOS_WRKDIR_IMGS\"" >> "$ENV_FILE"
+}
+
 # Function to check if the script is sourced or executed
 is_sourced() {
     [[ "${BASH_SOURCE[0]}" != "$0" ]]
@@ -48,11 +78,10 @@ if is_sourced; then
 else
     script_dir="$(cd "$(dirname "$0")" && pwd)"
 fi
-echo "Script directory: $script_dir"
+#echo "Script directory: $script_dir"
 
 BASH_MAIN=$(realpath "$script_dir/..")
-export BASH_MAIN
-echo "BASH_MAIN: $BASH_MAIN"
+#echo "BASH_MAIN: $BASH_MAIN"
 
 # Function to source helper scripts
 source_helper() {
@@ -68,22 +97,31 @@ source_helper() {
 # Source the helper script
 source_helper "$BASH_MAIN/scripts/utils.sh" || exit 1
 
+# Export function to be used by other scripts
+export -f source_helper
+
 ignore_error=false # dont ignore bash commands errors
 ###
 
 # Toolchain
 print_info "======================================"
 print_info ">>> Toolchain setup ................."
+
+# fallback path in case it is not in pATH
 TOOLCHAIN_PATH=$(realpath "$BASH_MAIN/../Toolchains/arm/arm-gnu-toolchain-12.3.rel1-x86_64-aarch64-none-elf")
-export TOOLCHAIN_PATH
-echo "$TOOLCHAIN_PATH"
 TOOLCHAIN_PREFIX=aarch64-none-elf-
-export TOOLCHAIN_PREFIX
-CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
-export CROSS_COMPILE
+CROSS_COMPILE="$TOOLCHAIN_PREFIX"
+# Check if CROSS_COMPILE is in path
 cross_compile_gcc="$CROSS_COMPILE""gcc"
-# Test cross compilation toolchain without echoing its output to the terminal
-$cross_compile_gcc --version >/dev/null 2>&1 # if errors, it exits
+
+# Run the command and capture its exit status
+if ! $cross_compile_gcc --version >/dev/null 2>&1; then
+    echo "Error: Cross-compile GCC command failed."
+    echo "Setting fallback toolchain..."
+    CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
+    # Test cross compilation toolchain without echoing its output to the terminal
+    $cross_compile_gcc --version >/dev/null 2>&1 # if errors, it exits
+fi
 print_info "CROSS_COMPILE = $CROSS_COMPILE"
 print_info "======================================"
 
@@ -131,35 +169,23 @@ fi
 print_info "======================================"
 echo ""
 
-# echo "============= Build folder setup ============="
-# # Read the user's choice
-# read -p "Enter the main folder for build and run: " repo_dir
-# # echo "Repo dir = $repo_dir"
-# repo="$BASH_MAIN/$repo_dir"
-# if [ -d "$repo" ]; then
-#     echo "Removing previous build folder: $repo"
-#     rm -rf "$repo"
-# fi
-# echo "======================================"
-# echo ""
-
 ignore_error=false
 # Platform, Demo, and Arch
-export PLATFORM=${PLATFORMS[$plat_index]} # qemu-aarch64-virt
-export DEMO=${DEMOS[$demo_index]} # linux + freertos
-export BUILD_TYPE=${BUILD_TYPES[$build_type_index]} # Build Type
+PLATFORM=${PLATFORMS[$plat_index]} # qemu-aarch64-virt
+DEMO=${DEMOS[$demo_index]} # linux + freertos
+BUILD_TYPE=${BUILD_TYPES[$build_type_index]} # Build Type
 
 # setup arch according to Appendix I
 case "$PLATFORM" in 
     "${PLATFORMS[10]}")
-	export ARCH=${ARCHS[2]} # riscv64
+	ARCH=${ARCHS[2]} # riscv64
 	;;
     "${PLATFORMS[8]}" | "${PLATFORMS[9]}")
-	export ARCH=${ARCHS[1]} # aarch32
+	ARCH=${ARCHS[1]} # aarch32
 	;;
     *)
 	# Other cases (aarch64)
-	export ARCH=${ARCHS[0]} # aarch64
+	ARCH=${ARCHS[0]} # aarch64
 	;;
 esac
 
@@ -167,39 +193,16 @@ esac
 ENV_FILE="$BASH_MAIN/scripts/env.txt"
 rm "$ENV_FILE" || true # remove file before each run
 
-save_var_to_file "CROSS_COMPILE" "$CROSS_COMPILE" "$ENV_FILE"
-save_array_to_file "DEMOS" "$ENV_FILE"
-save_array_to_file "PLATFORMS" "$ENV_FILE"
-save_array_to_file "ARCHS" "$ENV_FILE"
-save_array_to_file "BUILD_TYPES" "$ENV_FILE"
-
-save_var_to_file "PLATFORM" "$PLATFORM" "$ENV_FILE"
-save_var_to_file "DEMO" "$DEMO" "$ENV_FILE"
-save_var_to_file "ARCH" "$ARCH" "$ENV_FILE"
-save_var_to_file "BUILD_TYPE" "$BUILD_TYPE" "$ENV_FILE"
-
-print_info "======================================"
-print_info "............... Environment info ................."
-print_info "PLATFORM: $PLATFORM"
-print_info "DEMO: $DEMO"
-print_info "ARCH: $ARCH"
-print_info "BUILD_TYPE: $BUILD_TYPE"
-
 # Saving variables for run script
 RUN_DIR="$BASH_MAIN"
-print_info "RUN_DIR: $RUN_DIR"
-save_var_to_file "RUN_DIR" "$RUN_DIR" "$ENV_FILE"
-print_info "======================================"
 
 # Working directories
-print_info "======================================"
-print_info "............... Setting up Working directories ................."
-export BAO_DEMOS="$BASH_MAIN"
-export BAO_DEMOS_WRKDIR=$BAO_DEMOS/wrkdir
-export BAO_DEMOS_WRKDIR_SRC=$BAO_DEMOS_WRKDIR/srcs
-export BAO_DEMOS_WRKDIR_BIN=$BAO_DEMOS_WRKDIR/bin
-export BAO_DEMOS_WRKDIR_PLAT=$BAO_DEMOS_WRKDIR/imgs/$PLATFORM
-export BAO_DEMOS_WRKDIR_IMGS=$BAO_DEMOS_WRKDIR_PLAT/$DEMO
+BAO_DEMOS="$BASH_MAIN"
+BAO_DEMOS_WRKDIR=$BAO_DEMOS/wrkdir
+BAO_DEMOS_WRKDIR_SRC=$BAO_DEMOS_WRKDIR/srcs
+BAO_DEMOS_WRKDIR_BIN=$BAO_DEMOS_WRKDIR/bin
+BAO_DEMOS_WRKDIR_PLAT=$BAO_DEMOS_WRKDIR/imgs/$PLATFORM
+BAO_DEMOS_WRKDIR_IMGS=$BAO_DEMOS_WRKDIR_PLAT/$DEMO
 
 # Prompt user to remove previous build
 ignore_error=true
@@ -218,20 +221,10 @@ create_dir "$BAO_DEMOS_WRKDIR_SRC"
 create_dir "$BAO_DEMOS_WRKDIR_BIN"
 create_dir "$BAO_DEMOS_WRKDIR_IMGS"
 
-print_info "BAO_DEMOS             = $BAO_DEMOS"
-print_info "BAO_DEMOS_WRKDIR      = $BAO_DEMOS_WRKDIR"
-print_info "BAO_DEMOS_WRKDIR_SRC  = $BAO_DEMOS_WRKDIR_SRC"
-print_info "BAO_DEMOS_WRKDIR_BIN  = $BAO_DEMOS_WRKDIR_BIN"
-print_info "BAO_DEMOS_WRKDIR_PLAT = $BAO_DEMOS_WRKDIR_PLAT"
-print_info "BAO_DEMOS_WRKDIR_IMGS = $BAO_DEMOS_WRKDIR_IMGS"
+# Save environment and print it
+save_env
+print_env
 
-# Saving variables for run script
-echo "BAO_DEMOS=\"$BAO_DEMOS\"" >> "$ENV_FILE"
-echo "BAO_DEMOS_WRKDIR=\"$BAO_DEMOS_WRKDIR\"" >> "$ENV_FILE"
-echo "BAO_DEMOS_WRKDIR_SRC=\"$BAO_DEMOS_WRKDIR_SRC\"" >> "$ENV_FILE"
-echo "BAO_DEMOS_WRKDIR_BIN=\"$BAO_DEMOS_WRKDIR_BIN\"" >> "$ENV_FILE"
-echo "BAO_DEMOS_WRKDIR_PLAT=\"$BAO_DEMOS_WRKDIR_PLAT\"" >> "$ENV_FILE"
-echo "BAO_DEMOS_WRKDIR_IMGS=\"$BAO_DEMOS_WRKDIR_IMGS\"" >> "$ENV_FILE"
-echo "======================================"
 
 print_info "Call build.sh for building..."
+

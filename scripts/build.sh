@@ -28,29 +28,30 @@
 bt="$1"
 patches="$2"
 
-# Set script absolute path
-script_dir="$(cd "$(dirname "$0")" && pwd)"
-#echo "$script_dir"
-BASH_MAIN=$(realpath "$script_dir/..")
-export BASH_MAIN
-#echo "$BASH_MAIN"
-
-# Obtain additional utility functions
-source_helper(){
-    # local help_script=$1
-    source $(realpath "$1")
-    if [ ! $? -eq 0 ]; then
-	print_error "Could not find helper script $1"
-	print_error "Aborting..."
-	exit
-    fi
-    print_info "Sourced: $1"
-}
-# source_helper "$helper_script"
+# # Set script absolute path
+# script_dir="$(cd "$(dirname "$0")" && pwd)"
+# #echo "$script_dir"
+# BASH_MAIN=$(realpath "$script_dir/..")
+# export BASH_MAIN
+# #echo "$BASH_MAIN"
+# 
+# # Obtain additional utility functions
+# source_helper(){
+#     # local help_script=$1
+#     source $(realpath "$1")
+#     if [ ! $? -eq 0 ]; then
+# 	print_error "Could not find helper script $1"
+# 	print_error "Aborting..."
+# 	exit
+#     fi
+#     print_info "Sourced: $1"
+# }
+# # source_helper "$helper_script"
 source_helper "$BASH_MAIN/scripts/utils.sh"
-
-# Setting environment
+# 
+# # Setting environment
 setup_env
+#print_env
 
 # Check if Build type is auto
 # setup arch according to Appendix I

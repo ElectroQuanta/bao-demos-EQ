@@ -61,19 +61,11 @@ case "$PLATFORM" in
     ${PLATFORMS[3]})
 	echo "3"
 	;;
-    ${PLATFORMS[4]})
+    "${PLATFORMS[4]}")
 	# echo "4"
-	helper_script="$BASH_MAIN/scripts/platforms/rpi4.sh"
-	source_helper $helper_script
+	source_helper "$BASH_MAIN/scripts/platforms/rpi4.sh"
 
-	# Get firwmare
-	get_rpi4_fw
-
-	# Build uboot with the following config
-	uboot_build rpi_4_defconfig
-
-	# ARM Trusted firmware build
-	atf_build
+	build_bootloader "$bt"
 	;;
     ${PLATFORMS[5]})
 	# echo "5"

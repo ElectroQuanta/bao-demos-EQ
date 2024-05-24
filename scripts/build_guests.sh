@@ -23,32 +23,33 @@
 #  */
 
 # Set script absolute path
-script_dir="$(cd "$(dirname "$0")" && pwd)"
-echo "$script_dir"
-
-BASH_MAIN=$(realpath "$script_dir/..")
-export BASH_MAIN
-echo "$BASH_MAIN"
+# script_dir="$(cd "$(dirname "$0")" && pwd)"
+# echo "$script_dir"
+# 
+# BASH_MAIN=$(realpath "$script_dir/..")
+# export BASH_MAIN
+# echo "$BASH_MAIN"
 
 bt="$1"
 patches="$2"
 
-# Obtain additional utility functions
-source_helper(){
-    # local help_script=$1
-    source $(realpath "$1")
-    if [ ! $? -eq 0 ]; then
-	print_error "Could not find helper script $1"
-	print_error "Aborting..."
-	exit
-    fi
-    print_info "Sourced: $1"
-}
-# source_helper "$helper_script"
+# # Obtain additional utility functions
+# source_helper(){
+#     # local help_script=$1
+#     source $(realpath "$1")
+#     if [ ! $? -eq 0 ]; then
+# 	print_error "Could not find helper script $1"
+# 	print_error "Aborting..."
+# 	exit
+#     fi
+#     print_info "Sourced: $1"
+# }
+# # source_helper "$helper_script"
 source_helper "$BASH_MAIN/scripts/utils.sh"
 
 # Setting environment
 setup_env
+#print_env
 
 # ============== Build guest
 print_info "=================================="
@@ -93,4 +94,4 @@ case "$DEMO" in
 	;;
 esac
 
-cd "$BASH_MAIN" || echo "Missing $BASH_MAIN" & return 1
+cd "$BASH_MAIN" || (echo "Missing $BASH_MAIN" && return 1)

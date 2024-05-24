@@ -84,7 +84,7 @@ buildroot-$ARCH-$BAO_DEMOS_LINUX_VERSION"
 	git clone $repo $BAO_DEMOS_BUILDROOT --depth 1\
 	    --branch $branch
     fi
-    cd "$BAO_DEMOS_BUILDROOT" || echo "Missing $BAO_DEMOS_BUILDROOT" & return 1
+    cd "$BAO_DEMOS_BUILDROOT" || ( echo "Missing $BAO_DEMOS_BUILDROOT" && return 1 )
 
 
     if [ "$bt" == "clean" ] ; then
