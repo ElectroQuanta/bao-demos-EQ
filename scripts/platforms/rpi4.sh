@@ -18,8 +18,8 @@ export BAO_DEMOS_ATF="$BAO_DEMOS_WRKDIR_SRC"/arm-trusted-firmware
 get_rpi4_fw() {
 	print_info "====== Get RPI4 firmware"
 	repo_url="https://github.com/raspberrypi/firmware.git"
-	#firmware_version="1.20240424" # FIX: latest
-	firmware_version="1.20240306" # FIX: https://github.com/bao-project/bao-demos/commit/3833f5cbdf27b1c730132d745c4e4f362f168976
+	firmware_version="1.20240424" # FIX: latest
+	#	firmware_version="1.20240306" # FIX: https://github.com/bao-project/bao-demos/commit/3833f5cbdf27b1c730132d745c4e4f362f168976
 	# firmware_version="1.20230405" # withdrawn from rpi4/make.mk (HANGS)
 
 	if [ ! -d "$BAO_DEMOS_FW" ]; then
@@ -39,8 +39,8 @@ uboot_build() {
 	print_info "...................... Building U-Boot ................... "
 	# Cloning repo
 	repo_url="https://github.com/u-boot/u-boot.git"
-	#release_tag="v2024.04"
-	release_tag="v2022.10"
+	release_tag="v2024.04"
+	#	release_tag="v2022.10"
 
 	if [ ! -d "$BAO_DEMOS_UBOOT" ]; then
 		echo "Rebuilding branch = $release_tag..."
@@ -70,11 +70,11 @@ atf_build() {
 	print_info "...................... Building ATF ................... "
 
 	# Cloning repo
-	#repo_url="https://github.com/ARM-software/arm-trusted-firmware.git"
-	#release_tag="lts-v2.10.4"
+	repo_url="https://github.com/ARM-software/arm-trusted-firmware.git"
+	release_tag="lts-v2.10.4"
 
-	repo_url="https://github.com/bao-project/arm-trusted-firmware.git"
-	release_tag="bao/demo"
+	# repo_url="https://github.com/bao-project/arm-trusted-firmware.git"
+	# release_tag="bao/demo"
 
 	if [ ! -d "$BAO_DEMOS_ATF" ]; then
 		echo "Rebuilding ATF branch = $release_tag"
