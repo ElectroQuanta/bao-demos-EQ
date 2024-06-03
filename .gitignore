@@ -3,3 +3,5 @@ wrkdir/
 env.txt
 
 SDCard
+
+compile_commands.json
