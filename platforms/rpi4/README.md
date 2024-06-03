@@ -56,11 +56,11 @@ After [preparing your sd card](../../platforms/sdcard.md), copy the firmware
 and bao's final image to it:
 
 ```
-cp -rf $BAO_DEMOS_WRKDIR_PLAT/firmware/boot/* $BAO_DEMOS_SDCARD
-cp $BAO_DEMOS/platforms/rpi4/config.txt $BAO_DEMOS_SDCARD
-cp $BAO_DEMOS_WRKDIR_PLAT/bl31.bin $BAO_DEMOS_SDCARD
-cp $BAO_DEMOS_WRKDIR_PLAT/u-boot.bin $BAO_DEMOS_SDCARD
-cp $BAO_DEMOS_WRKDIR_IMGS/bao.bin $BAO_DEMOS_SDCARD
+cp -vrf $BAO_DEMOS_WRKDIR_PLAT/firmware/boot/* $BAO_DEMOS_SDCARD
+cp -v $BAO_DEMOS/platforms/rpi4/config.txt $BAO_DEMOS_SDCARD
+cp -v $BAO_DEMOS_WRKDIR_PLAT/bl31.bin $BAO_DEMOS_SDCARD
+cp -v $BAO_DEMOS_WRKDIR_PLAT/u-boot.bin $BAO_DEMOS_SDCARD
+cp -v $BAO_DEMOS_WRKDIR_IMGS/bao.bin $BAO_DEMOS_SDCARD
 umount $BAO_DEMOS_SDCARD
 ```
 

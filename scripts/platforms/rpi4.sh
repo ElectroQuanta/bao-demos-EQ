@@ -302,6 +302,9 @@ copy_files() {
 	sudo cp -v "$BAO_DEMOS_WRKDIR_PLAT"/* "$BAO_DEMOS_SDCARD"
 	# sudo cp -v $BAO_DEMOS_WRKDIR_PLAT/u-boot.bin $BAO_DEMOS_SDCARD
 	# sudo cp -v $BAO_DEMOS_WRKDIR_IMGS/bao.bin $BAO_DEMOS_SDCARD
+
+	# Flush data to SD card
+	sync
 }
 
 print_next_steps() {
