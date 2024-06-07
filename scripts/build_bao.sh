@@ -25,25 +25,9 @@
 bt="$1"    # build type
 patch="$2" # patches
 
-# Set script absolute path
+# Paths
 script_dir="$(cd "$(dirname "$0")" && pwd)"
-echo "$script_dir"
-
 BASH_MAIN=$(realpath "$script_dir/..")
-export BASH_MAIN
-echo "$BASH_MAIN"
-
-# Obtain additional utility functions
-source_helper() {
-	local help_script=$1
-	if ! source "$help_script"; then
-		echo "Could not find helper script $help_script"
-		echo "Aborting..."
-		exit
-	fi
-	print_info "Sourced: $help_script"
-}
-# source_helper "$helper_script"
 source_helper "$BASH_MAIN/scripts/utils.sh"
 
 # Setting environment

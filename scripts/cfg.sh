@@ -18,14 +18,13 @@
 #  * 5. Saves relevant environmental vars to env.txt for convenient usage by the run script
 #  *
 #  * @copyright 2023 MIT license
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #  */
-
 
 # PREREQUISITE: Repository was cloned
 # # Clone repo and cd into it
@@ -37,68 +36,56 @@
 # clone_repo "$repo" "$msg" "$cmd"
 # cd "$repo"
 
+save_env() {
+	#	export BASH_MAIN
+	#	export CROSS_COMPILE PLATFORM DEMO ARCH BUILD_TYPE
+	#	export BAO_DEMOS BAO_DEMOS_WRKDIR BAO_DEMOS_WRKDIR_SRC
+	#	export BAO_DEMOS_WRKDIR_BIN BAO_DEMOS_WRKDIR_PLAT BAO_DEMOS_WRKDIR_IMGS
 
-save_env(){
-    export BASH_MAIN
-    export CROSS_COMPILE PLATFORM DEMO ARCH BUILD_TYPE
-    export BAO_DEMOS BAO_DEMOS_WRKDIR BAO_DEMOS_WRKDIR_SRC
-    export BAO_DEMOS_WRKDIR_BIN BAO_DEMOS_WRKDIR_PLAT BAO_DEMOS_WRKDIR_IMGS
+	save_var_to_file "CROSS_COMPILE" "$CROSS_COMPILE" "$ENV_FILE"
+	save_array_to_file "DEMOS" "$ENV_FILE"
+	save_array_to_file "PLATFORMS" "$ENV_FILE"
+	save_array_to_file "ARCHS" "$ENV_FILE"
+	save_array_to_file "BUILD_TYPES" "$ENV_FILE"
 
+	save_var_to_file "RUN_DIR" "$RUN_DIR" "$ENV_FILE"
 
-    save_var_to_file "CROSS_COMPILE" "$CROSS_COMPILE" "$ENV_FILE"
-    save_array_to_file "DEMOS" "$ENV_FILE"
-    save_array_to_file "PLATFORMS" "$ENV_FILE"
-    save_array_to_file "ARCHS" "$ENV_FILE"
-    save_array_to_file "BUILD_TYPES" "$ENV_FILE"
+	save_var_to_file "PLATFORM" "$PLATFORM" "$ENV_FILE"
+	save_var_to_file "DEMO" "$DEMO" "$ENV_FILE"
+	save_var_to_file "ARCH" "$ARCH" "$ENV_FILE"
+	save_var_to_file "BUILD_TYPE" "$BUILD_TYPE" "$ENV_FILE"
 
-    save_var_to_file "RUN_DIR" "$RUN_DIR" "$ENV_FILE"
-
-    save_var_to_file "PLATFORM" "$PLATFORM" "$ENV_FILE"
-    save_var_to_file "DEMO" "$DEMO" "$ENV_FILE"
-    save_var_to_file "ARCH" "$ARCH" "$ENV_FILE"
-    save_var_to_file "BUILD_TYPE" "$BUILD_TYPE" "$ENV_FILE"
-
-
-    echo "BAO_DEMOS=\"$BAO_DEMOS\"" >> "$ENV_FILE"
-    echo "BAO_DEMOS_WRKDIR=\"$BAO_DEMOS_WRKDIR\"" >> "$ENV_FILE"
-    echo "BAO_DEMOS_WRKDIR_SRC=\"$BAO_DEMOS_WRKDIR_SRC\"" >> "$ENV_FILE"
-    echo "BAO_DEMOS_WRKDIR_BIN=\"$BAO_DEMOS_WRKDIR_BIN\"" >> "$ENV_FILE"
-    echo "BAO_DEMOS_WRKDIR_PLAT=\"$BAO_DEMOS_WRKDIR_PLAT\"" >> "$ENV_FILE"
-    echo "BAO_DEMOS_WRKDIR_IMGS=\"$BAO_DEMOS_WRKDIR_IMGS\"" >> "$ENV_FILE"
+	echo "BAO_DEMOS=\"$BAO_DEMOS\"" >>"$ENV_FILE"
+	echo "BAO_DEMOS_WRKDIR=\"$BAO_DEMOS_WRKDIR\"" >>"$ENV_FILE"
+	echo "BAO_DEMOS_WRKDIR_SRC=\"$BAO_DEMOS_WRKDIR_SRC\"" >>"$ENV_FILE"
+	echo "BAO_DEMOS_WRKDIR_BIN=\"$BAO_DEMOS_WRKDIR_BIN\"" >>"$ENV_FILE"
+	echo "BAO_DEMOS_WRKDIR_PLAT=\"$BAO_DEMOS_WRKDIR_PLAT\"" >>"$ENV_FILE"
+	echo "BAO_DEMOS_WRKDIR_IMGS=\"$BAO_DEMOS_WRKDIR_IMGS\"" >>"$ENV_FILE"
 }
 
-# Function to check if the script is sourced or executed
-is_sourced() {
-    [[ "${BASH_SOURCE[0]}" != "$0" ]]
-}
+## Function to check if the script is sourced or executed
+#is_sourced() {
+#	[[ "${BASH_SOURCE[0]}" != "$0" ]]
+#}
+#
+## Determine script directory
+#if is_sourced; then
+#	script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+#else
+#	script_dir="$(cd "$(dirname "$0")" && pwd)"
+#fi
 
-# Determine script directory
-if is_sourced; then
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-else
-    script_dir="$(cd "$(dirname "$0")" && pwd)"
-fi
+script_dir="$(cd "$(dirname "$0")" && pwd)"
 #echo "Script directory: $script_dir"
 
 BASH_MAIN=$(realpath "$script_dir/..")
 #echo "BASH_MAIN: $BASH_MAIN"
 
-# Function to source helper scripts
-source_helper() {
-    local help_script=$1
-    if ! source "$(realpath "$help_script")"; then
-        echo "Error: Could not find or source helper script $help_script"
-        echo "Aborting..."
-        return 1  # Use return instead of exit
-    fi
-    echo "Sourced: $help_script"
-}
-
 # Source the helper script
-source_helper "$BASH_MAIN/scripts/utils.sh" || exit 1
+source "$BASH_MAIN/scripts/utils.sh" || (echo "Failed to source utils.sh" && exit 1)
 
 # Export function to be used by other scripts
-export -f source_helper
+#export -f source_helper
 
 ignore_error=false # dont ignore bash commands errors
 ###
@@ -116,11 +103,11 @@ cross_compile_gcc="$CROSS_COMPILE""gcc"
 
 # Run the command and capture its exit status
 if ! $cross_compile_gcc --version >/dev/null 2>&1; then
-    echo "Error: Cross-compile GCC command failed."
-    echo "Setting fallback toolchain..."
-    CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
-    # Test cross compilation toolchain without echoing its output to the terminal
-    $cross_compile_gcc --version >/dev/null 2>&1 # if errors, it exits
+	echo "Error: Cross-compile GCC command failed."
+	echo "Setting fallback toolchain..."
+	CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
+	# Test cross compilation toolchain without echoing its output to the terminal
+	$cross_compile_gcc --version >/dev/null 2>&1 # if errors, it exits
 fi
 print_info "CROSS_COMPILE = $CROSS_COMPILE"
 print_info "======================================"
@@ -138,9 +125,9 @@ print_info "========== Select Demo =========="
 get_user_choice "${DEMOS[@]}"
 demo_index=$?
 if [ $demo_index -eq 255 ]; then
-    print_error "Invalid choice. Exiting."
-    return 1
-    # exit 1
+	print_error "Invalid choice. Exiting."
+	#return 1
+	exit 1
 fi
 print_info "======================================"
 echo ""
@@ -150,9 +137,9 @@ print_info "========== Select Platform =========="
 get_user_choice "${PLATFORMS[@]}"
 plat_index=$?
 if [ $plat_index -eq 255 ]; then
-    print_error "Invalid choice. Exiting."
-    return 1
-    #exit 1
+	print_error "Invalid choice. Exiting."
+	# return 1
+	exit 1
 fi
 print_info "======================================"
 echo ""
@@ -162,28 +149,28 @@ print_info "========== Select Build Type =========="
 get_user_choice "${BUILD_TYPES[@]}"
 build_type_index=$?
 if [ $build_type_index -eq 255 ]; then
-    print_error "Invalid choice. Exiting."
-    #exit 1
-    return 1
+	print_error "Invalid choice. Exiting."
+	exit 1
+	#return 1
 fi
 print_info "======================================"
 echo ""
 
 ignore_error=false
 # Platform, Demo, and Arch
-PLATFORM=${PLATFORMS[$plat_index]} # qemu-aarch64-virt
-DEMO=${DEMOS[$demo_index]} # linux + freertos
+PLATFORM=${PLATFORMS[$plat_index]}           # qemu-aarch64-virt
+DEMO=${DEMOS[$demo_index]}                   # linux + freertos
 BUILD_TYPE=${BUILD_TYPES[$build_type_index]} # Build Type
 
 # setup arch according to Appendix I
-case "$PLATFORM" in 
-    "${PLATFORMS[10]}")
+case "$PLATFORM" in
+"${PLATFORMS[10]}")
 	ARCH=${ARCHS[2]} # riscv64
 	;;
-    "${PLATFORMS[8]}" | "${PLATFORMS[9]}")
+"${PLATFORMS[8]}" | "${PLATFORMS[9]}")
 	ARCH=${ARCHS[1]} # aarch32
 	;;
-    *)
+*)
 	# Other cases (aarch64)
 	ARCH=${ARCHS[0]} # aarch64
 	;;
@@ -210,10 +197,10 @@ print_info "Remove previous build?"
 get_user_choice "${YES_NO_OPTS[@]}"
 answer_index=$?
 if [ $answer_index -eq 0 ]; then # yes
-    if [ -d "$BAO_DEMOS_WRKDIR" ]; then
-	print_info ">> Removing previous working directory"
-	rm -rf "$BAO_DEMOS_WRKDIR" || true
-    fi
+	if [ -d "$BAO_DEMOS_WRKDIR" ]; then
+		print_info ">> Removing previous working directory"
+		rm -rf "$BAO_DEMOS_WRKDIR" || true
+	fi
 fi
 
 create_dir "$BAO_DEMOS_WRKDIR"
@@ -225,6 +212,4 @@ create_dir "$BAO_DEMOS_WRKDIR_IMGS"
 save_env
 print_env
 
-
 print_info "Call build.sh for building..."
-
