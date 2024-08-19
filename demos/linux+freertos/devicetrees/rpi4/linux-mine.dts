@@ -38,9 +38,16 @@
 	};
 
 	memory@20000000 {
-		reg = <0x0 0x20000000 0x0 0x40000000>;
+		//reg = <0x0 0x20000000 0x0 0x40000000>;
+		reg = <0x0 0x20000000 0x0 0x80000000>;
 		device_type = "memory";
 	};
+
+
+	//memory@0 {
+	//	device_type = "memory";
+	//	reg = <0x00 0x00 0x00>;
+	//};
 
 	reserved-memory {
 		#address-cells = <0x02>;
@@ -62,6 +69,18 @@
 		reg = <0x0 0xff841000 0x0 0x1000>,
 		      <0x0 0xff842000 0x0 0x2000>;
 	};
+
+		
+	//	gic: interrupt-controller@40041000 {
+	//	  #address-cells = <0x01>;
+	//	  #size-cells = <0x01>;
+	//			interrupt-controller;
+	//			#interrupt-cells = <0x03>;
+	//			compatible = "arm,gic-400";
+	//			reg = <0x40041000 0x1000 0x40042000 0x2000 0x40044000 0x2000 0x40046000 0x2000>;
+	//			interrupts = <0x01 0x09 0xf04>;
+	//			phandle = <0x01>;
+	//		};
 
 	timer {
 		compatible = "arm,armv8-timer";
@@ -112,12 +131,34 @@
 		id = <0>;
     };
 
+
+    // uart1
+     uart1: serial@7e215040 {
+      //#address-cells = <0x01>;
+      //#size-cells = <0x01>;
+    			compatible = "brcm,bcm2835-aux-uart";
+    			reg = <0x0 0x7e215040 0x0 0x40>;
+    			interrupts = <0x00 0x5d 0x04>;
+    			//	clocks = <0x11 0x00>;
+    			status = "okay";
+    			pinctrl-names = "default";
+    			pinctrl-0 = <0x12>;
+    			skip-init;
+    			//phandle = <0x44>;
+        };
+
 	aliases {
 		ethernet0 = &genet;
+		serial0 = &uart1; // uart1
 	};
 
 	chosen {
-		bootargs = "earlycon clk_ignore_unused ip=192.168.42.15 carrier_timeout=0";
+		//stdout-path = "serial0:115200n8";
+		/* 8250 auxiliary UART instead of pl011 */
+		stdout-path = "serial0:115200n8";
+		// bootargs = "coherent_pool=1M 8250.nr_uarts=1 snd_bcm2835.enable_headphones=0";
+		//bootargs = "earlycon clk_ignore_unused ip=192.168.42.15 carrier_timeout=0";
+		bootargs = "console=serial0,115200";
 	};
 
 };

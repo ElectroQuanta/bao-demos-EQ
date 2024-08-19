@@ -7,3 +7,4 @@ SDCard
 # Files
 build.log
 bao-venv/
+compile_commands.json
