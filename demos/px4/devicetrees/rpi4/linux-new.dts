@@ -1,0 +1,250 @@
+/dts-v1/;
+
+/ {
+	#address-cells = <0x02>;
+	memreserve = <0x3b400000 0x4c00000>;
+	model = "Raspberry Pi 4 Model B Rev 1.5";
+	#size-cells = <0x02>;
+	compatible = "raspberrypi,4-model-b\0brcm,bcm2711";
+	interrupt-parent = <&gic>;
+
+	cpus {
+		#size-cells = <0x0>;
+		#address-cells = <0x1>;
+
+		cpu@0 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x0>;
+		};
+
+		cpu@1 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x1>;
+		};
+
+		cpu@2 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x2>;
+		};
+
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
+	memory@20000000 {
+		reg = <0x0 0x20000000 0x0 0x40000000>;
+		device_type = "memory";
+	};
+
+	reserved-memory {
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			size = <0x4000000>;
+			reusable;
+			linux,cma-default;
+		};
+	};
+
+	//gic: interrupt-controller@3881000 {
+	//	compatible = "arm,gic-400";
+	//	#interrupt-cells = <3>;
+	//	interrupt-controller;
+	//	reg = <0x0 0xff841000 0x0 0x1000>,
+	//	      <0x0 0xff842000 0x0 0x2000>;
+	//};
+	gic: interrupt-controller@40041000 {
+			interrupt-controller;
+			#interrupt-cells = <0x03>;
+			compatible = "arm,gic-400";
+			reg = <0x40041000 0x1000 0x40042000 0x2000 0x40044000 0x2000 0x40046000 0x2000>;
+			interrupts = <0x01 0x09 0xf04>;
+			phandle = <0x01>;
+		};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <0x1 0xd 0xf08 0x1 0xe 0xf08 0x1 0xb 0xf08 0x1 0xa 0xf08>;
+	};
+
+	scb@7c000000 {
+		compatible = "simple-bus";
+		#address-cells = <0x02>;
+		#size-cells = < 0x02 >;
+		dma-ranges = < 0x00 0x00 0x00 0x00 0x04 0x00 >;
+		ranges = < 0x00 0x7c000000 0x00 0xfc000000 0x00 0x3800000 0x00 0x40000000 0x00 0xff800000 0x00 0x800000 0x06 0x00 0x06 0x00 0x00 0x40000000 0x00 0x00 0x00 0x00 0x00 0xfc000000 >;
+
+		genet: ethernet@7d580000 {
+			local-mac-address = [dc a6 32 a3 9c 57];
+			compatible = "brcm,bcm2711-genet-v5", "brcm,genet-v5";
+			reg = < 0x00 0x7d580000 0x00 0x10000 >;
+			#address-cells = <0x1>;
+			#size-cells = <0x1>;
+			interrupts = <0 157 4>,
+						<0 158 4>;
+			status = "okay";
+
+			phy-handle = <&phy1>;
+			phy-mode = "rgmii-rxid";
+
+			genet_mdio: mdio@e14 {
+				compatible = "brcm,genet-mdio-v5";
+				reg = <0xe14 0x8>;
+				reg-names = "mdio";
+				#address-cells = <0x0>;
+				#size-cells = <0x1>;
+
+				phy1: ethernet-phy@1 {
+					reg = <0x01>;
+					led-modes = < 0x00 0x08 >;
+				};
+			};
+		};
+	};
+
+	soc@7e000000 {
+		compatible = "simple-bus";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges = <0x7e000000 0x00 0xfe000000 0x1800000 0x7c000000 0x00 0xfc000000 0x2000000 0x40000000 0x00 0xff800000 0x800000>;
+		dma-ranges = <0xc0000000 0x00 0x00 0x40000000 0x7c000000 0x00 0xfc000000 0x3800000>;
+		phandle = <0x61>;
+
+		firmware {
+			compatible = "raspberrypi,bcm2835-firmware\0simple-mfd";
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			mboxes = <0x35>;
+			dma-ranges;
+			phandle = <0x06>;
+
+			clocks {
+				compatible = "raspberrypi,firmware-clocks";
+				#clock-cells = <0x01>;
+				phandle = <0x14>;
+			};
+
+			gpio {
+				compatible = "raspberrypi,firmware-gpio";
+				gpio-controller;
+				#gpio-cells = <0x02>;
+				status = "okay";
+				gpio-line-names = "BT_ON\0WL_ON\0PWR_LED_OFF\0GLOBAL_RESET\0VDD_SD_IO_SEL\0CAM_GPIO\0SD_PWR_ON\0SD_OC_N";
+				phandle = <0x0b>;
+			};
+
+			reset {
+				compatible = "raspberrypi,firmware-reset";
+				#reset-cells = <0x01>;
+				phandle = <0x3f>;
+			};
+
+			vcio {
+				compatible = "raspberrypi,vcio";
+				phandle = <0xdd>;
+			};
+		};
+		cprman@7e101000 {
+			compatible = "brcm,bcm2711-cprman";
+			#clock-cells = <0x01>;
+			reg = <0x7e101000 0x2000>;
+			clocks = <0x03 0x04 0x00 0x04 0x01 0x04 0x02 0x05 0x00 0x05 0x01 0x05 0x02>;
+			firmware = <0x06>;
+			phandle = <0x08>;
+		};
+
+		aux@7e215000 {
+			compatible = "brcm,bcm2835-aux";
+			#clock-cells = <0x01>;
+			reg = <0x7e215000 0x08>;
+			clocks = <0x08 0x14>;
+			phandle = <0x11>;
+		};
+
+			uart1_pins {
+				brcm,pins;
+				brcm,function;
+				brcm,pull;
+				phandle = <0x12>;
+			};
+
+	serial0: serial@7e215040 {
+			compatible = "brcm,bcm2835-aux-uart";
+			reg = <0x0 0x7e215040 0x0 0x40>;
+			interrupts = <0x00 0x5d 0x04>;
+			clocks = <0x11 0x00>;
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <0x12>;
+			skip-init;
+			phandle = <0x44>;
+		};
+	};
+
+    bao-ipc@f0000000 {
+        compatible = "bao,ipcshmem";
+        reg = <0x0 0xf0000000 0x0 0x00010000>;
+		read-channel = <0x0 0x2000>;
+		write-channel = <0x2000 0x2000>;
+        interrupts = <0 52 1>;
+		id = <0>;
+    };
+
+	clocks {
+
+		clk-osc {
+			compatible = "fixed-clock";
+			#clock-cells = <0x00>;
+			clock-output-names = "osc";
+			clock-frequency = <0x337f980>;
+			phandle = <0x03>;
+		};
+
+		clk-usb {
+			compatible = "fixed-clock";
+			#clock-cells = <0x00>;
+			clock-output-names = "otg";
+			clock-frequency = <0x1c9c3800>;
+			phandle = <0x16>;
+		};
+	};
+
+	clk-27M {
+		#clock-cells = <0x00>;
+		compatible = "fixed-clock";
+		clock-frequency = <0x19bfcc0>;
+		clock-output-names = "27MHz-clock";
+		phandle = <0x2f>;
+	};
+
+	clk-108M {
+		#clock-cells = <0x00>;
+		compatible = "fixed-clock";
+		clock-frequency = <0x66ff300>;
+		clock-output-names = "108MHz-clock";
+		phandle = <0x2a>;
+	};
+
+	aliases {
+		ethernet0 = &genet;
+		uart1 = &serial0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs = "coherent_pool=1M 8250.nr_uarts=1 console=ttyS0,115200 console=tty1";
+	};
+
+};

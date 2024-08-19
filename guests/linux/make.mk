@@ -11,7 +11,7 @@ $(linux_src):
 	git -C $(linux_src) apply $(linux_patches)
 
 buildroot_repo:=https://github.com/buildroot/buildroot.git
-buildroot_version:=2022.11
+buildroot_version:=2024.02.3
 buildroot_src:=$(wrkdir_src)/buildroot-$(ARCH)-$(linux_version)
 buildroot_defcfg:=$(bao_demos)/guests/linux/buildroot/$(ARCH).config
 

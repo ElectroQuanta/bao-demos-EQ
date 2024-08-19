@@ -276,6 +276,18 @@ check_deps() {
     done
 }
 
+###################################################
+# Function to source helper scripts
+source_helper() {
+    local help_script=$1
+    if ! source "$(realpath "$help_script")"; then
+        echo "Error: Could not find or source helper script $help_script"
+        echo "Aborting..."
+        return 1  # Use return instead of exit
+    fi
+    echo "Sourced: $help_script"
+}
+
 ######################################################
 setup_env() {
     # Retrieve saved variables

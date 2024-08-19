@@ -67,38 +67,12 @@ save_env(){
     echo "BAO_DEMOS_WRKDIR_IMGS=\"$BAO_DEMOS_WRKDIR_IMGS\"" >> "$ENV_FILE"
 }
 
-# Function to check if the script is sourced or executed
-is_sourced() {
-    [[ "${BASH_SOURCE[0]}" != "$0" ]]
-}
-
-# Determine script directory
-if is_sourced; then
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-else
-    script_dir="$(cd "$(dirname "$0")" && pwd)"
-fi
-#echo "Script directory: $script_dir"
-
+script_dir="$(cd "$(dirname "$0")" && pwd)"
 BASH_MAIN=$(realpath "$script_dir/..")
-#echo "BASH_MAIN: $BASH_MAIN"
-
-# Function to source helper scripts
-source_helper() {
-    local help_script=$1
-    if ! source "$(realpath "$help_script")"; then
-        echo "Error: Could not find or source helper script $help_script"
-        echo "Aborting..."
-        return 1  # Use return instead of exit
-    fi
-    echo "Sourced: $help_script"
-}
+echo "BASH_MAIN: $BASH_MAIN"
 
 # Source the helper script
-source_helper "$BASH_MAIN/scripts/utils.sh" || exit 1
-
-# Export function to be used by other scripts
-export -f source_helper
+source "$BASH_MAIN/scripts/utils.sh" || exit 1
 
 ignore_error=false # dont ignore bash commands errors
 ###
@@ -108,17 +82,22 @@ print_info "======================================"
 print_info ">>> Toolchain setup ................."
 
 # fallback path in case it is not in pATH
-TOOLCHAIN_PATH=$(realpath "$BASH_MAIN/../Toolchains/arm/arm-gnu-toolchain-12.3.rel1-x86_64-aarch64-none-elf")
+#TOOLCHAIN_PATH=$(realpath "$BASH_MAIN/../Toolchains/arm/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf")
+TOOLCHAIN_PATH=$(realpath "$BASH_MAIN/../Toolchains/arm/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-elf")
 TOOLCHAIN_PREFIX=aarch64-none-elf-
+#TOOLCHAIN_PATH=$(realpath "/home/zmp/Documents/br-main/toolchains/aarch64-buildroot-linux-gnu_sdk-buildroot")
+#TOOLCHAIN_PREFIX=aarch64-linux-
 CROSS_COMPILE="$TOOLCHAIN_PREFIX"
+echo "$TOOLCHAIN_PATH"
 # Check if CROSS_COMPILE is in path
-cross_compile_gcc="$CROSS_COMPILE""gcc"
+cross_compile_gcc="${CROSS_COMPILE}gcc"
 
 # Run the command and capture its exit status
 if ! $cross_compile_gcc --version >/dev/null 2>&1; then
     echo "Error: Cross-compile GCC command failed."
     echo "Setting fallback toolchain..."
     CROSS_COMPILE="$TOOLCHAIN_PATH"/bin/"$TOOLCHAIN_PREFIX"
+    cross_compile_gcc="${CROSS_COMPILE}gcc"
     # Test cross compilation toolchain without echoing its output to the terminal
     $cross_compile_gcc --version >/dev/null 2>&1 # if errors, it exits
 fi
@@ -139,8 +118,7 @@ get_user_choice "${DEMOS[@]}"
 demo_index=$?
 if [ $demo_index -eq 255 ]; then
     print_error "Invalid choice. Exiting."
-    return 1
-    # exit 1
+    exit 1
 fi
 print_info "======================================"
 echo ""
@@ -151,8 +129,7 @@ get_user_choice "${PLATFORMS[@]}"
 plat_index=$?
 if [ $plat_index -eq 255 ]; then
     print_error "Invalid choice. Exiting."
-    return 1
-    #exit 1
+    exit 1
 fi
 print_info "======================================"
 echo ""
@@ -163,8 +140,7 @@ get_user_choice "${BUILD_TYPES[@]}"
 build_type_index=$?
 if [ $build_type_index -eq 255 ]; then
     print_error "Invalid choice. Exiting."
-    #exit 1
-    return 1
+    exit 1
 fi
 print_info "======================================"
 echo ""

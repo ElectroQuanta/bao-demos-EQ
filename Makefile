@@ -1,9 +1,10 @@
-SHELL:=bash
+SHELL:=/bin/bash
 
+########## Check requirements
+# PLATFORM, CROSS_COMPILE, DEMO, ARCH
 bao_demos:=$(abspath .)
 platform_dir:=$(bao_demos)/platforms/$(PLATFORM)
 demo_dir:=$(bao_demos)/demos/$(DEMO)
-SHELL:=/bin/bash
 
 ifeq ($(filter clean distclean, $(MAKECMDGOALS)),)
 ifndef CROSS_COMPILE
@@ -24,7 +25,7 @@ endif
 ifndef DEMO
  $(error No target DEMO defined.)
 endif
-    
+
 ifeq ($(wildcard $(demo_dir)),)
  $(error Target demo $(DEMO) is not supported)
 endif
@@ -33,10 +34,10 @@ ifeq ($(wildcard $(demo_dir)/configs/$(PLATFORM).c),)
  $(error The $(DEMO) demo is not supported by the $(PLATFORM) platform)
 endif
 
-endif 
+endif
+##################################
 
-# utility functions
-
+################# utility functions
 ifeq ($(NO_INSTRUCTIONS),)
 define print-instructions
 	@for i in {1..80}; do printf "-"; done ; printf "\n"
@@ -50,9 +51,9 @@ define print-instructions
 		else for i in {1..80}; do printf "-"; done ; printf "\n"; fi
 endef
 endif
+########################################
 
-# setup working directories
-
+################# setup working directories
 wrkdir:=$(bao_demos)/wrkdir
 wrkdir_src:=$(wrkdir)/srcs
 wrkdir_bin:=$(wrkdir)/bin
@@ -66,13 +67,21 @@ environment+=BAO_DEMOS_WRKDIR=$(wrkdir)
 environment+=BAO_DEMOS_WRKDIR_SRC=$(wrkdir_src)
 environment+=BAO_DEMOS_WRKDIR_PLAT=$(wrkdir_plat_imgs)
 environment+=BAO_DEMOS_WRKDIR_IMGS=$(wrkdir_demo_imgs)
-environment+=BAO_DEMOS_SDCARD_DEV=/dev/yoursdcarddev
-environment+=BAO_DEMOS_SDCARD=/media/$$USER/boot
+environment+=BAO_DEMOS_SDCARD=/run/media/$$USER/boot
+environment+=BAO_DEMOS_SDCARD_DEV=/dev/sda
+
+
+export BAO_DEMOS=$(bao_demos)
+export BAO_DEMOS_WRKDIR=$(wrkdir)
+export BAO_DEMOS_WRKDIR_SRC=$(wrkdir_src)
+export BAO_DEMOS_WRKDIR_PLAT=$(wrkdir_plat_imgs)
+
 
 all: platform 
 
-bao_repo:=https://github.com/bao-project/bao-hypervisor
-bao_version:=demo
+#bao_repo:=https://github.com/bao-project/bao-hypervisor
+bao_repo:=https://github.com/ElectroQuanta/bao-hypervisor-porting
+bao_version:=main
 bao_src:=$(wrkdir_src)/bao
 bao_cfg_repo:=$(wrkdir_demo_imgs)/config
 wrkdirs+=$(bao_cfg_repo)
@@ -90,6 +99,8 @@ guests: $(guest_images)
 
 $(bao_src):
 	git clone --branch $(bao_version) $(bao_repo) $(bao_src)
+	git -C $(bao_src) submodule init
+	git -C $(bao_src) submodule update --recursive
 
 $(bao_cfg): | $(bao_cfg_repo)
 	cp -L $(bao_demos)/demos/$(DEMO)/configs/$(PLATFORM).c $(bao_cfg)
@@ -109,7 +120,8 @@ bao_clean:
 		CONFIG=$(DEMO)\
 		CPPFLAGS=-DBAO_DEMOS_WRKDIR_IMGS=$(wrkdir_demo_imgs)
 
-platform: $(bao_image)
+#platform: $(bao_image)
+#	@echo "I'm the platform target being called"
 
 guests_clean bao_clean platform_clean:
 

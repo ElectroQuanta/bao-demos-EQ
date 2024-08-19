@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# /etc/init.d/S01load_modules: Local boot script to load kernel modules.
+#
+
+case "$1" in
+    start)
+        echo "Loading kernel modules..."
+        modprobe i2c-bcm2708
+        modprobe i2c-dev
+        ;;
+    stop)
+        echo "Unloading kernel modules..."
+        modprobe -r i2c-dev
+        modprobe -r i2c-bcm2708
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+
+exit 0

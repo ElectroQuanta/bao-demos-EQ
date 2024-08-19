@@ -33,19 +33,7 @@ echo "$script_dir"
 export BASH_MAIN=$(realpath "$script_dir/..")
 echo "$BASH_MAIN"
 
-# Obtain additional utility functions
-source_helper(){
-    # local help_script=$1
-    source "$1"
-    if [ ! $? -eq 0 ]; then
-	echo "Could not find helper script $1"
-	echo "Aborting..."
-	exit
-    fi
-    print_info "Sourced: $1"
-}
-# source_helper "$helper_script"
-source_helper "$BASH_MAIN/scripts/utils.sh"
+source "$BASH_MAIN/scripts/utils.sh" || exit 1
 
 # Setting environment
 setup_env

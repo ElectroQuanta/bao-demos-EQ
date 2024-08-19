@@ -1,0 +1,290 @@
+/dts-v1/;
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	interrupt-parent = <&gic>;
+
+
+	aliases {
+	  serial0 = &uart1;
+	  ethernet0 = &genet;
+	  clocks = "/soc/cprman@7e101000";
+	  clk_osc = "/clocks/clk-osc";
+	  //firmware_clocks = "/soc/firmware/clocks";
+	};
+
+	chosen {
+		bootargs = "earlycon console=serial0,115200 clk_ignore_unused ip=192.168.42.15 carrier_timeout=0";
+        stdout-path = "serial0:115200n8";
+	};
+
+
+	cpus {
+		#size-cells = <0x0>;
+		#address-cells = <0x1>;
+
+		cpu@0 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x0>;
+		};
+
+		cpu@1 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x1>;
+		};
+
+		cpu@2 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x2>;
+		};
+
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
+	memory@20000000 {
+		reg = <0x0 0x20000000 0x0 0x40000000>;
+		device_type = "memory";
+	};
+
+	reserved-memory {
+		#address-cells = <0x02>;
+		#size-cells = <0x01>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			size = <0x4000000>;
+			reusable;
+			linux,cma-default;
+		};
+	};
+
+	gic: interrupt-controller@3881000 {
+		compatible = "arm,gic-400";
+		#interrupt-cells = <3>;
+		interrupt-controller;
+		reg = <0x0 0xff841000 0x0 0x1000>,
+		      <0x0 0xff842000 0x0 0x2000>;
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <0x1 0xd 0xf08 0x1 0xe 0xf08 0x1 0xb 0xf08 0x1 0xa 0xf08>;
+	};
+
+
+	clocks {
+
+	clkOsc: clk-osc {
+			clock-output-names = "osc";
+			#clock-cells = <0x00>;
+			clock-frequency = <0x337f980>;
+			compatible = "fixed-clock";
+			phandle = <0x03>;
+		};
+
+	clkUSB:	clk-usb {
+			clock-output-names = "otg";
+			#clock-cells = <0x00>;
+			clock-frequency = <0x1c9c3800>;
+			compatible = "fixed-clock";
+			phandle = <0x16>;
+		};
+
+	    uartclk: uartclk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <500000000>;
+		};
+	};
+
+
+	soc {
+		compatible = "simple-bus";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges = <0x7e000000 0x00 0xfe000000 0x1800000 0x7c000000 0x00 0xfc000000 0x2000000 0x40000000 0x00 0xff800000 0x800000>;
+		dma-ranges = <0xc0000000 0x00 0x00 0x40000000 0x7c000000 0x00 0xfc000000 0x3800000>;
+		phandle = <0x5f>;
+
+
+		//		firmware {
+		//			dma-ranges;
+		//			#address-cells = <0x01>;
+		//			#size-cells = <0x01>;
+		//			compatible = "raspberrypi,bcm2835-firmware\0simple-mfd";
+		//			phandle = <0x06>;
+		//			mboxes = <0x35>;
+		//
+		//			gpio {
+		//				gpio-controller;
+		//				gpio-line-names = "BT_ON\0WL_ON\0PWR_LED_OFF\0GLOBAL_RESET\0VDD_SD_IO_SEL\0CAM_GPIO\0SD_PWR_ON\0SD_OC_N";
+		//				compatible = "raspberrypi,firmware-gpio";
+		//				status = "okay";
+		//				phandle = <0x0b>;
+		//				#gpio-cells = <0x02>;
+		//			};
+		//
+		//			reset {
+		//				#reset-cells = <0x01>;
+		//				compatible = "raspberrypi,firmware-reset";
+		//				phandle = <0x3f>;
+		//			};
+		//
+		//			clocks {
+		//				#clock-cells = <0x01>;
+		//				compatible = "raspberrypi,firmware-clocks";
+		//				phandle = <0x14>;
+		//			};
+		//
+		//			vcio {
+		//				compatible = "raspberrypi,vcio";
+		//				phandle = <0xdd>;
+		//			};
+		//		};
+		//
+		//		mailbox@7e00b880 {
+		//			interrupts = <0x00 0x21 0x04>;
+		//			#mbox-cells = <0x00>;
+		//			compatible = "brcm,bcm2835-mbox";
+		//			reg = <0x7e00b880 0x40>;
+		//			phandle = <0x35>;
+		//		};
+
+
+		aux@7e215000 {
+			clocks = <0x08 0x14>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2835-aux";
+			reg = <0x7e215000 0x08>;
+			phandle = <0x11>;
+		};
+
+
+		cprman@7e101000 {
+			clocks = <0x03 0x04 0x00 0x04 0x01 0x04 0x02 0x05 0x00 0x05 0x01 0x05 0x02>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2711-cprman";
+			firmware = <0x06>;
+			reg = <0x7e101000 0x2000>;
+			phandle = <0x08>;
+		};
+
+
+		dsi@7e209000 {
+			power-domains = <0x10 0x11>;
+			#address-cells = <0x01>;
+			clock-output-names = "dsi0_byte\0dsi0_ddr2\0dsi0_ddr";
+			clock-names = "phy\0escape\0pixel";
+			interrupts = <0x00 0x64 0x04>;
+			clocks = <0x08 0x22 0x08 0x2f 0x08 0x31>;
+			#size-cells = <0x00>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2835-dsi0";
+			status = "disabled";
+			reg = <0x7e209000 0x78>;
+			phandle = <0x04>;
+		};
+
+
+		dsi@7e700000 {
+			power-domains = <0x10 0x12>;
+			#address-cells = <0x01>;
+			clock-output-names = "dsi1_byte\0dsi1_ddr2\0dsi1_ddr";
+			clock-names = "phy\0escape\0pixel";
+			interrupts = <0x00 0x6c 0x04>;
+			clocks = <0x08 0x23 0x08 0x30 0x08 0x32>;
+			#size-cells = <0x00>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2711-dsi1";
+			status = "disabled";
+			reg = <0x7e700000 0x8c>;
+			phandle = <0x05>;
+		};
+
+		//	uart0: serial@7e201000 {
+		//		  compatible = "arm,pl011\0arm,primecell";
+		//		  reg = <0x7e201000 0x200>;
+		//		  interrupts = <0x00 0x79 0x04>;
+		//		  clocks = <0x08 0x13 0x08 0x14>;
+		//		  clock-names = "uartclk\0apb_pclk";
+		//		  arm,primecell-periphid = <0x241011>;
+		//		  status = "okay";
+		//		  cts-event-workaround;
+		//		  pinctrl-names = "default";
+		//		  pinctrl-0 = <0x09 0x0a>;
+		//		  uart-has-rtscts;
+		//		  skip-init;
+		//		  phandle = <0x43>;
+		//		};
+
+	uart1: serial@7e215040 {
+		  compatible = "brcm,bcm2835-aux-uart";
+		  reg = <0x7e215040 0x40>;
+		  interrupts = <0x00 0x5d 0x04>;
+		  clocks = <0x11 0x00>;
+		  //clocks = <&uartclk>;
+		  status = "okay";
+		};
+
+	};
+
+
+
+	scb@7c000000 {
+		compatible = "simple-bus";
+		#address-cells = <0x02>;
+		#size-cells = < 0x02 >;
+		dma-ranges = < 0x00 0x00 0x00 0x00 0x04 0x00 >;
+		ranges = < 0x00 0x7c000000 0x00 0xfc000000 0x00 0x3800000 0x00 0x40000000 0x00 0xff800000 0x00 0x800000 0x06 0x00 0x06 0x00 0x00 0x40000000 0x00 0x00 0x00 0x00 0x00 0xfc000000 >;
+
+		genet: ethernet@7d580000 {
+			local-mac-address = [dc a6 32 a3 9c 57];
+			compatible = "brcm,bcm2711-genet-v5", "brcm,genet-v5";
+			reg = < 0x00 0x7d580000 0x00 0x10000 >;
+			#address-cells = <0x1>;
+			#size-cells = <0x1>;
+			interrupts = <0 157 4>,
+						<0 158 4>;
+			status = "okay";
+
+			phy-handle = <&phy1>;
+			phy-mode = "rgmii-rxid";
+
+			genet_mdio: mdio@e14 {
+				compatible = "brcm,genet-mdio-v5";
+				reg = <0xe14 0x8>;
+				reg-names = "mdio";
+				#address-cells = <0x0>;
+				#size-cells = <0x1>;
+
+				phy1: ethernet-phy@1 {
+					reg = <0x01>;
+					led-modes = < 0x00 0x08 >;
+				};
+			};
+		};
+	};
+
+    bao-ipc@f0000000 {
+        compatible = "bao,ipcshmem";
+        reg = <0x0 0xf0000000 0x0 0x00010000>;
+		read-channel = <0x0 0x2000>;
+		write-channel = <0x2000 0x2000>;
+        interrupts = <0 52 1>;
+		id = <0>;
+    };
+
+};
+

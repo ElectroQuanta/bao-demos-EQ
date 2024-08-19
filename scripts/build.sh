@@ -29,9 +29,9 @@ bt="$1"
 patches="$2"
 
 # # Set script absolute path
-# script_dir="$(cd "$(dirname "$0")" && pwd)"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
 # #echo "$script_dir"
-# BASH_MAIN=$(realpath "$script_dir/..")
+BASH_MAIN=$(realpath "$script_dir/..")
 # export BASH_MAIN
 # #echo "$BASH_MAIN"
 # 
@@ -47,7 +47,7 @@ patches="$2"
 #     print_info "Sourced: $1"
 # }
 # # source_helper "$helper_script"
-source_helper "$BASH_MAIN/scripts/utils.sh"
+source "$BASH_MAIN/scripts/utils.sh" || exit 1
 # 
 # # Setting environment
 setup_env

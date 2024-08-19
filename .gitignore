@@ -3,3 +3,7 @@ wrkdir/
 env.txt
 
 SDCard
+
+# Files
+build.log
+bao-venv/

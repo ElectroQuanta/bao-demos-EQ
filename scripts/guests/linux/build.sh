@@ -47,7 +47,7 @@ setup_linux_kernel(){
     # Apply patches
     if [ "$patches" == "1" ] ; then
 	print_info ">> Applying kernel patches..."
-	cd "$BAO_DEMOS_LINUX_SRC" || echo "Missing $BAO_DEMOS_LINUX_SRC" & exit
+	cd "$BAO_DEMOS_LINUX_SRC" || (echo "Missing $BAO_DEMOS_LINUX_SRC" && exit 1)
 	git apply "$BAO_DEMOS_LINUX/patches/$BAO_DEMOS_LINUX_VERSION/*.patch"
     fi
 
@@ -79,7 +79,7 @@ buildroot-$ARCH-$BAO_DEMOS_LINUX_VERSION"
 	repo="https://github.com/buildroot/buildroot.git"
 	#branch="2022.11"
 	#branch="2023.11.1"
-	branch="2024.02"
+	branch="2024.02.3"
 	print_info "Cloning $repo into $BAO_DEMOS_BUILDROOT: branch $branch"
 	git clone $repo $BAO_DEMOS_BUILDROOT --depth 1\
 	    --branch $branch
@@ -99,7 +99,7 @@ buildroot-$ARCH-$BAO_DEMOS_LINUX_VERSION"
 	ignore_error=false
 	print_info "====== Build Buildroot"
 	make defconfig BR2_DEFCONFIG="$BAO_DEMOS_BUILDROOT_DEFCFG"
-	print_info "$BR2_DEFCONFIG"
+	print_info "$BAO_DEMOS_BUILDROOT_DEFCFG"
 	read -rp "Press to build buildroot: " user_input
 	# Building
 	ignore_error=true
@@ -153,13 +153,14 @@ linux_build() {
     #    local plat=$1
     #    PLATFORMS=("zcu102" "zcu104" "imx8qm" "tx2" "rpi4" "qemu-aarch64-virt" "fvp-a-aarch64" "fvp-a-aarch32" "fvp-r-aarch64" "fvp-r-aarch32" "qemu-riscv64-virt")
     local bt=$1
+    local patch=$2
     
     print_info "========================================"
     print_info ".................... Building linux ................ "
     print_info "Requirements: cpio, unzip, dtc"
 
     # setup linux kernel build_type{deep, clean, nil} patches{1,0}
-    setup_linux_kernel "$bt" 1
+    setup_linux_kernel "$bt" "$patch"
     #setup_linux_kernel deep 0
 
     # Build linux system (kernel + filesystem) with buildroot build_type{deep, clean, nil}

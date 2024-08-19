@@ -23,29 +23,17 @@
 #  */
 
 # Set script absolute path
-# script_dir="$(cd "$(dirname "$0")" && pwd)"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
 # echo "$script_dir"
 # 
-# BASH_MAIN=$(realpath "$script_dir/..")
+BASH_MAIN=$(realpath "$script_dir/..")
 # export BASH_MAIN
 # echo "$BASH_MAIN"
 
-bt="$1"
-patches="$2"
+bt="$1" # build type
+patches="$2" # patches
 
-# # Obtain additional utility functions
-# source_helper(){
-#     # local help_script=$1
-#     source $(realpath "$1")
-#     if [ ! $? -eq 0 ]; then
-# 	print_error "Could not find helper script $1"
-# 	print_error "Aborting..."
-# 	exit
-#     fi
-#     print_info "Sourced: $1"
-# }
-# # source_helper "$helper_script"
-source_helper "$BASH_MAIN/scripts/utils.sh"
+source "$BASH_MAIN/scripts/utils.sh" || exit 1
 
 # Setting environment
 setup_env
@@ -94,4 +82,4 @@ case "$DEMO" in
 	;;
 esac
 
-cd "$BASH_MAIN" || (echo "Missing $BASH_MAIN" && return 1)
+cd "$BASH_MAIN" || (echo "Missing $BASH_MAIN" && exit 1)
