@@ -123,7 +123,20 @@ bao_clean:
 #platform: $(bao_image)
 #	@echo "I'm the platform target being called"
 
-guests_clean bao_clean platform_clean:
+#guests_clean bao_clean platform_clean:
+
+firmware_clean:
+	-@rm -vrf $(wrkdir)/imgs/$(PLATFORM)/firmware
+
+atf_clean: 
+	-@rm -v $(wrkdir)/imgs/$(PLATFORM)/bl31.bin
+
+uboot_clean: 
+	-@rm -v $(wrkdir)/imgs/$(PLATFORM)/u-boot.bin
+
+platform_clean: firmware_clean atf_clean uboot_clean
+
+guests_clean bao_clean:
 
 clean: guests_clean bao_clean platform_clean
 	-@rm -rf $(wrkdir)/imgs/$(PLATFORM)/$(DEMO)

@@ -2,6 +2,9 @@ linux_base_dir := $(bao_demos)/guests/px4/linux
 
 linux_repo?=https://github.com/torvalds/linux.git
 linux_version?=v6.1
+#linux_repo?=https://github.com/raspberrypi/linux.git
+#linux_version?=stable_20240529 # v6.6
+#linux_version?=stable_20240124
 linux_src:=$(wrkdir_src)/linux-$(linux_version)
 linux_cfg_frag:=$(wildcard $(linux_base_dir)/configs/base.config\
 	$(linux_base_dir)/configs/$(ARCH).config\
@@ -12,7 +15,7 @@ export BAO_DEMOS_LINUX_CFG_FRAG=$(linux_cfg_frag)
 
 $(linux_src):
 	git clone --depth 1 --branch $(linux_version) $(linux_repo) $(linux_src)
-	git -C $(linux_src) apply $(linux_patches)
+#git -C $(linux_src) apply $(linux_patches)
 
 buildroot_repo:=https://github.com/buildroot/buildroot.git
 buildroot_version:=2024.02.3
@@ -39,7 +42,7 @@ clean-dtb:
 
 define build-linux
 $(wrkdir_demo_imgs)/$(basename $(notdir $2)).dtb: $(strip $2)
-	dtc $$< > $$@
+	dtc -@ $$< > $$@
 $(strip $1): $(buildroot_image) $(wrkdir_demo_imgs)/$(basename $(notdir $2)).dtb
 	$(MAKE) -C $(lloader_dir) ARCH=$(ARCH) IMAGE=$(buildroot_image)\
 		DTB=$(wrkdir_demo_imgs)/$(basename $(notdir $2)).dtb TARGET=$$(basename $$@)
