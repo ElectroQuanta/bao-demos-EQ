@@ -27,10 +27,10 @@ $(eval $(call build-atf, $(atf_image), $(atf_plat)))
 
 instructions:=$(bao_demos)/platforms/$(PLATFORM)/README.md
 
-platform: $(bao_image) $(uboot_image) $(atf_image)  $(firmware_images) 
-	$(call print-instructions, $(instructions), 1, false)
-	$(call print-instructions, $(instructions), 2, false)
-	$(call print-instructions, $(instructions), 3, true)
+platform: $(bao_image) $(uboot_image) $(atf_image) $(firmware_images) 
+#	$(call print-instructions, $(instructions), 1, false)
+#	$(call print-instructions, $(instructions), 2, false)
+#	$(call print-instructions, $(instructions), 3, true)
 
 deploySD: platform
 	@echo "Wrkdir: $(BAO_DEMOS_WRKDIR)"

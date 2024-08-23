@@ -131,8 +131,14 @@ firmware_clean:
 atf_clean: 
 	-@rm -v $(wrkdir)/imgs/$(PLATFORM)/bl31.bin
 
+atf_distclean: 
+	$(MAKE) -C $(wrkdir_src)/atf-$(ARCH) distclean
+
 uboot_clean: 
 	-@rm -v $(wrkdir)/imgs/$(PLATFORM)/u-boot.bin
+
+uboot_distclean: 
+	$(MAKE) -C $(wrkdir_src)/u-boot distclean
 
 platform_clean: firmware_clean atf_clean uboot_clean
 

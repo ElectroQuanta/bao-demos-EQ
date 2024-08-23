@@ -1,6 +1,13 @@
 uboot_repo:=https://github.com/u-boot/u-boot.git
-uboot_version:=v2024.04
+uboot_version:=v2024.07
 uboot_src:=$(wrkdir_src)/u-boot
+
+uboot_load_bin:=linux.bin
+uboot_load_bin_addr:=0x20000000
+env_file:=$(uboot_src)/board/raspberrypi/rpi/rpi.env
+env_file_cfg:=board/raspberrypi/rpi/rpi.env
+uboot_cfg:=$(uboot_src)/.config
+dtb_dir:=$(wrkdir_plat_imgs)/broadcom
 
 $(uboot_src):
 	git clone --depth 1 --branch $(uboot_version) $(uboot_repo) $(uboot_src)
@@ -8,10 +15,35 @@ $(uboot_src):
 define build-uboot
 $(strip $1): $(uboot_src)
 	$(MAKE) -C $(uboot_src) $(strip $2)
-	echo $(strip $3) >> $(uboot_src)/.config
-	$(MAKE) -C $(uboot_src) -j$(nproc) 
+#	@echo $(strip $3) >> $(uboot_src)/.config
+	@echo "Modifying U-Boot environment"
+# Uboot config
+#	@printf "CONFIG_OF_SEPARATE=n\n" >> $(uboot_cfg)
+#	@printf "CONFIG_OF_EMBED=y\n" >> $(uboot_cfg)
+#	@printf "CONFIG_OF_OMIT_DTB=n\n" >> $(uboot_cfg)
+#	@printf "CONFIG_OF_BOARD=n\n" >> $(uboot_cfg)
+#	@printf "CONFIG_OF_HAS_PRIOR_STAGE=n\n" >> $(uboot_cfg)
+#	@printf "CONFIG_SPECIFY_CONSOLE_INDEX=y\n" >> $(uboot_cfg)
+#	@printf "CONFIG_CONS_INDEX=5\n" >> $(uboot_cfg)
+# CONFIG_OF_BOARD is not set
+# CONFIG_OF_HAS_PRIOR_STAGE=y
+#CONFIG_SPECIFY_CONSOLE_INDEX=y
+#CONFIG_CONS_INDEX=1
+#	@printf "CONFIG_BOOTDELAY=5\n" >> $(uboot_cfg)
+#	@printf "CONFIG_ENV_SOURCE_FILE=\"$(env_file_cfg)\"\n" >> $(uboot_cfg)
+# Env file
+	@printf "\n\nbootcmd_fatload=fatload mmc 0 $(uboot_load_bin_addr) $(uboot_load_bin); go $(uboot_load_bin_addr)\n" >> $(env_file)
+	@printf "bootcmd=run bootcmd_fatload\n" >> $(env_file)
+# Make
+	$(MAKE) -C $(uboot_src) -j$(nproc)
+# Copy
 	cp $(uboot_src)/u-boot.bin $$@
+#	mkdir -p $(dtb_dir)
+#	cp -v $(uboot_src)/dts/dt.dtb $(dtb_dir)/bcm2711-rpi-4-b.dtb
+#	cp  $(uboot_src)/dts/dt.dtb $(wrkdir_plat_imgs)/u-boot.dtb
+#	read -p "Hello"
 endef
+
 
 u-boot: $(wrkdir_plat_imgs)/u-boot.bin
 

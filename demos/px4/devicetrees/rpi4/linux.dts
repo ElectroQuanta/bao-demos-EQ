@@ -6,16 +6,16 @@
 	interrupt-parent = <0x01>;
 
  aliases:	aliases {
-		serial0 = "/soc/serial@7e201000";
-		serial1 = "/soc/serial@7e215040";
-		serial5 = "/soc/serial@7e201a00";
-		ethernet0 = "/scb@7c000000/ethernet@7d580000";
+		serial0 = &uart0;
+		serial1 = &uart1;
+		serial5 = &uart5;
+		ethernet0 = &genet;
 		phandle = <0x0c>;
 	};
 
  chosen:	chosen {
-		stdout-path = "serial0:115200n8";
-		bootargs = "earlycon console=serial0,115200 clk_ignore_unused ip=192.168.42.15 carrier_timeout=0";
+		stdout-path = "serial5:115200n8";
+		bootargs = "earlycon console=serial5,115200 clk_ignore_unused ip=192.168.42.15 carrier_timeout=0";
 		phandle = <0x17>;
 	};
 

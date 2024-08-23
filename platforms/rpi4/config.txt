@@ -3,4 +3,6 @@ enable_gic=1
 armstub=bl31.bin
 kernel=u-boot.bin
 dtoverlay=disable-bt
+dtoverlay=uart5
 enable_uart=1
+uart_2ndstage=1
