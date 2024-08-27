@@ -3,8 +3,8 @@ ARCH:=aarch64
 ####################### Firmware
 firmware_repo:=https://github.com/raspberrypi/firmware.git
 #firmware_version:=1.20240306
-firmware_version:=1.20240424
-#firmware_version:=1.20240306
+#firmware_version:=1.20240424
+firmware_version:=1.20240529
 #firmware_version:=1.20230405
 firmware_images:=$(wrkdir_plat_imgs)/firmware
 

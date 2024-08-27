@@ -19,4 +19,9 @@ linux_image=$(wrkdir_demo_imgs)/linux.bin
 linux_dts=$(bao_demos)/demos/$(DEMO)/devicetrees/$(PLATFORM)/linux.dts
 $(eval $(call build-linux, $(linux_image), $(linux_dts)))
 
+
+clean-linux-bin: clean-dtb
+	-rm $(linux_image)
+	-rm $(wrkdir_demo_imgs)/linux.elf
+
 guest_images:=$(linux_image)

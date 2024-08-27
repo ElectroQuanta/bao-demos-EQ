@@ -46,26 +46,6 @@
 		phandle = <0xe2>;
 	};
 
-	regulator-sd-io-1v8 {
-		regulator-max-microvolt = <0x325aa0>;
-		regulator-boot-on;
-		regulator-settling-time-us = <0x1388>;
-		regulator-always-on;
-		regulator-min-microvolt = <0x1b7740>;
-		regulator-name = "vdd-sd-io";
-		compatible = "regulator-gpio";
-		status = "okay";
-		states = <0x1b7740 0x01 0x325aa0 0x00>;
-		phandle = <0x37>;
-		gpios = <&expgpio 0x04 0x00>;
-	};
-
-	zone_dma {
-		dma-ranges = <0x00 0x00 0x00 0x40000000>;
-		#address-cells = <0x01>;
-		#size-cells = <0x01>;
-	};
-
  aliases:	aliases {
 		serial0 = &uart0;
 		serial1 = &uart1;
@@ -116,20 +96,13 @@
 	};
 
 	psci {
-		//compatible = "arm,psci-0.2";
-		compatible = "arm,psci-1.0";
+		compatible = "arm,psci-0.2";
 		method = "smc";
 	};
 
 	memory@0 {
 		device_type = "memory";
 		reg = <0x00 0x00 0x3b400000 0x00 0x40000000 0xbc000000 0x01 0x00 0x80000000 0x01 0x80000000 0x80000000>;
-	};
-
-	arm-pmu {
-		interrupt-affinity = <0x39 0x3a 0x3b 0x3c>;
-		interrupts = <0x00 0x10 0x04 0x00 0x11 0x04 0x00 0x12 0x04 0x00 0x13 0x04>;
-		compatible = "arm,cortex-a72-pmu\0arm,armv8-pmuv3\0arm,cortex-a7-pmu";
 	};
 
 
@@ -193,26 +166,6 @@ cam_dummy_reg:	cam_dummy_reg {
 			phandle = <0x5b>;
 			reusable;
 		};
-
-		// nvram@0 {
-		// 	#address-cells = <0x01>;
-		// 	#size-cells = <0x01>;
-		// 	compatible = "raspberrypi,bootloader-config\0nvmem-rmem";
-		// 	status = "okay";
-		// 	reg = <0x00 0x3ef64ae0 0x36>;
-		// 	phandle = <0x5c>;
-		// 	no-map;
-		// };
-
-		// nvram@1 {
-		// 	#address-cells = <0x01>;
-		// 	#size-cells = <0x01>;
-		// 	compatible = "raspberrypi,bootloader-public-key\0nvmem-rmem";
-		// 	status = "okay";
-		// 	reg = <0x00 0x3ef646a0 0x400>;
-		// 	phandle = <0x5d>;
-		// 	no-map;
-		// };
 	};
 
 	timer {
@@ -1497,14 +1450,12 @@ cam_dummy_reg:	cam_dummy_reg {
 				reg = <0x00>;
 				clocks = <&clk_sc16is752>;
 				interrupt-parent = <&gpio>;
-				//interrupts = <&spi1_int_pins 0x02>;
 				interrupts = <0x18 0x02>;
-				//pinctrl-0 = <&spi1_int_pins>;
-				//pinctrl-names = "default";
+				pinctrl-0 = <&spi1_int_pins>;
+				pinctrl-names = "default";
 				gpio-controller;
 				#gpio-cells = <0x02>;
 				spi-max-frequency = "\0=\t";
-				//spi-max-frequency = "0x09";
 				phandle = <0x100>;
 			};
 		};

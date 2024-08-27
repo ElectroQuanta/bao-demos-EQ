@@ -13,6 +13,12 @@ _start:
     bic	x0, x0, x1
     msr	sctlr_el1, x0
 
+    /* make sure mmu disable */
+    mrs	x0, sctlr_el2
+    mov x1, #1
+    bic	x0, x0, x1
+    msr	sctlr_el2, x0
+
     isb
 
     /* boot protocol */

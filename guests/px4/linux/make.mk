@@ -3,8 +3,8 @@ linux_base_dir := $(bao_demos)/guests/px4/linux
 #linux_repo?=https://github.com/torvalds/linux.git
 #linux_version?=v6.1
 linux_repo?=https://github.com/raspberrypi/linux.git
-#linux_version?=stable_20240529 # v6.6
-linux_version?=stable_20240124
+linux_version?=stable_20240529
+#linux_version?=stable_20240124
 linux_src:=$(wrkdir_src)/linux-$(linux_version)
 linux_cfg_frag:=$(wildcard $(linux_base_dir)/configs/base.config\
 	$(linux_base_dir)/configs/$(ARCH).config\
@@ -38,7 +38,7 @@ lloader_dir:=$(linux_base_dir)/lloader
 
 
 clean-dtb:
-	rm $(wrkdir_demo_imgs)/linux.dtb
+	-rm $(wrkdir_demo_imgs)/linux.dtb
 
 define build-linux
 $(wrkdir_demo_imgs)/$(basename $(notdir $2)).dtb: $(strip $2)
