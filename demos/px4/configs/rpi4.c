@@ -1,7 +1,7 @@
 #include <config.h>
 
 VM_IMAGE(linux_image, XSTR(BAO_DEMOS_WRKDIR_IMGS/linux.bin));
-#define LINUX_IMG_ENTRY 0x20000000
+#define LINUX_IMG_ENTRY 0x40000000
 
 struct config config = {
     
@@ -22,25 +22,32 @@ struct config config = {
             .platform = {
                 .cpu_num = 4,
                 
-                .region_num = 3,
+                //.region_num = 3,
+                .region_num = 1,
                 .regions =  (struct vm_mem_region[]) {
+                    //{
+                    //    .base = 0x0,
+                    //    .size = 0x3b400000,
+                    //    .place_phys = true,
+                    //    .phys = 0x0
+                    //},
+                    //{
+                    //    .base = 0x40000000,
+                    //    .size = 0xbc000000,
+                    //    .place_phys = true,
+                    //    .phys = 0x40000000
+                    //},
+                    //{
+                    //    .base = 0x100000000,
+                    //    .size = 0x80000000,
+                    //    .place_phys = true,
+                    //    .phys = 0x100000000,
+                    //},
                     {
-                        .base = 0x0,
-                        .size = 0x3b400000,
+                        .base = LINUX_IMG_ENTRY,
+                        .size = 0x80000000
                         .place_phys = true,
                         .phys = 0x0
-                    },
-                    {
-                        .base = 0x40000000,
-                        .size = 0xbc000000,
-                        .place_phys = true,
-                        .phys = 0x40000000
-                    },
-                    {
-                        .base = 0x100000000,
-                        .size = 0x80000000,
-                        .place_phys = true,
-                        .phys = 0x100000000,
                     },
                 },
 
