@@ -1665,6 +1665,19 @@ cam_dummy_reg:	cam_dummy_reg {
 			phandle = <0x43>;
 		};
 
+	uart5:	serial@7e201a00 {
+			compatible = "arm,pl011\0arm,primecell";
+			reg = <0x7e201a00 0x200>;
+			interrupts = <0x00 0x79 0x04>;
+			clocks = <&cprman 0x13 &cprman 0x14>;
+			clock-names = "uartclk\0apb_pclk";
+			arm,primecell-periphid = <0x241011>;
+			status = "okay";
+			pinctrl-0 = <&uart5_pins>;
+			pinctrl-names = "default";
+			phandle = <0xc7>;
+		};
+
 	aux:	aux@7e215000 {
 			clocks = <&cprman 0x14>;
 			#clock-cells = <0x01>;
@@ -1685,20 +1698,6 @@ cam_dummy_reg:	cam_dummy_reg {
 //			skip-init;
 //			phandle = <0x44>;
 //		};
-
-	uart5:	serial@7e201a00 {
-			compatible = "arm,pl011\0arm,primecell";
-			reg = <0x7e201a00 0x200>;
-			interrupts = <0x00 0x79 0x04>;
-			clocks = <&cprman 0x13 &cprman 0x14>;
-			clock-names = "uartclk\0apb_pclk";
-			arm,primecell-periphid = <0x241011>;
-			status = "okay";
-			pinctrl-0 = <&uart5_pins>;
-			pinctrl-names = "default";
-			phandle = <0xc7>;
-		};
-
 
 	spi1:	spi@7e215080 {
 			#address-cells = <0x01>;
@@ -1920,10 +1919,7 @@ cam_dummy_reg:	cam_dummy_reg {
 			};
 		};
 
-
 // PWM
-
-
 //	pwm:	pwm@7e20c000 {
 //			assigned-clocks = <&cprman 0x1e>;
 //			assigned-clock-rates = <0x2faf080>;
@@ -1950,8 +1946,6 @@ cam_dummy_reg:	cam_dummy_reg {
 
 //================ END SOC ======================
 	};
-
-
 
  scb:	scb@7c000000 {
 		compatible = "simple-bus";
