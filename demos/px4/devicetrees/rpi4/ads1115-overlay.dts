@@ -1,0 +1,203 @@
+/dts-v1/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+	fragment@0 {
+		target = <0x01>;
+
+		__dormant__ {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			channel_a {
+				reg = <0x04>;
+				ti,gain = <0x01>;
+				ti,datarate = <0x07>;
+				phandle = <0x03>;
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <0x01>;
+
+		__dormant__ {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			channel_b {
+				reg = <0x05>;
+				ti,gain = <0x01>;
+				ti,datarate = <0x07>;
+				phandle = <0x04>;
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <0x01>;
+
+		__dormant__ {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			channel_c {
+				reg = <0x06>;
+				ti,gain = <0x01>;
+				ti,datarate = <0x07>;
+				phandle = <0x05>;
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <0x01>;
+
+		__dormant__ {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+
+			channel_d {
+				reg = <0x07>;
+				ti,gain = <0x01>;
+				ti,datarate = <0x07>;
+				phandle = <0x06>;
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <0x02>;
+
+		__overlay__ {
+			#address-cells = <0x01>;
+			#size-cells = <0x00>;
+			status = "okay";
+
+			ads1115@48 {
+				compatible = "ti,ads1115";
+				status = "okay";
+				#address-cells = <0x01>;
+				#size-cells = <0x00>;
+				reg = <0x48>;
+				phandle = <0x01>;
+			};
+		};
+	};
+
+	fragment@100 {
+		target = <0xffffffff>;
+		phandle = <0x07>;
+
+		__overlay__ {
+			status = "okay";
+			phandle = <0x02>;
+		};
+	};
+
+	fragment@101 {
+		target = <0xffffffff>;
+
+		__dormant__ {
+			status = "okay";
+		};
+	};
+
+	fragment@102 {
+		target = <0xffffffff>;
+
+		__dormant__ {
+			status = "okay";
+		};
+	};
+
+	__overrides__ {
+		addr = [00 00 00 01 72 65 67 3a 30 00];
+		cha_enable = [00 00 00 00 3d 30 00];
+		cha_cfg = [00 00 00 03 72 65 67 3a 30 00];
+		cha_gain = [00 00 00 03 74 69 2c 67 61 69 6e 3a 30 00];
+		cha_datarate = [00 00 00 03 74 69 2c 64 61 74 61 72 61 74 65 3a 30 00];
+		chb_enable = [00 00 00 00 3d 31 00];
+		chb_cfg = [00 00 00 04 72 65 67 3a 30 00];
+		chb_gain = [00 00 00 04 74 69 2c 67 61 69 6e 3a 30 00];
+		chb_datarate = [00 00 00 04 74 69 2c 64 61 74 61 72 61 74 65 3a 30 00];
+		chc_enable = [00 00 00 00 3d 32 00];
+		chc_cfg = [00 00 00 05 72 65 67 3a 30 00];
+		chc_gain = [00 00 00 05 74 69 2c 67 61 69 6e 3a 30 00];
+		chc_datarate = [00 00 00 05 74 69 2c 64 61 74 61 72 61 74 65 3a 30 00];
+		chd_enable = [00 00 00 00 3d 33 00];
+		chd_cfg = [00 00 00 06 72 65 67 3a 30 00];
+		chd_gain = [00 00 00 06 74 69 2c 67 61 69 6e 3a 30 00];
+		chd_datarate = [00 00 00 06 74 69 2c 64 61 74 61 72 61 74 65 3a 30 00];
+		i2c0 = [00 00 00 07 74 61 72 67 65 74 3a 30 3d 00 ff ff ff ff];
+		i2c_csi_dsi = [00 00 00 07 74 61 72 67 65 74 3a 30 3d 00 ff ff ff ff 00 00 00 00 2b 31 30 31 2b 31 30 32 00];
+		i2c3 = "\0\0\0\atarget?=0\0\0\0\0\atarget-path=i2c3";
+		i2c4 = "\0\0\0\atarget?=0\0\0\0\0\atarget-path=i2c4";
+		i2c5 = "\0\0\0\atarget?=0\0\0\0\0\atarget-path=i2c5";
+		i2c6 = "\0\0\0\atarget?=0\0\0\0\0\atarget-path=i2c6";
+	};
+
+	__symbols__ {
+		channel_a = "/fragment@0/__dormant__/channel_a";
+		channel_b = "/fragment@1/__dormant__/channel_b";
+		channel_c = "/fragment@2/__dormant__/channel_c";
+		channel_d = "/fragment@3/__dormant__/channel_d";
+		ads1115 = "/fragment@4/__overlay__/ads1115@48";
+		frag100 = "/fragment@100";
+		i2cbus = "/fragment@100/__overlay__";
+	};
+
+	__fixups__ {
+		i2c1 = "/fragment@100:target:0";
+		i2c0if = "/fragment@101:target:0";
+		i2c0mux = "/fragment@102:target:0";
+		i2c0 = "/__overrides__:i2c0:14";
+		i2c_csi_dsi = "/__overrides__:i2c_csi_dsi:14";
+	};
+
+	__local_fixups__ {
+
+		fragment@0 {
+			target = <0x00>;
+		};
+
+		fragment@1 {
+			target = <0x00>;
+		};
+
+		fragment@2 {
+			target = <0x00>;
+		};
+
+		fragment@3 {
+			target = <0x00>;
+		};
+
+		fragment@4 {
+			target = <0x00>;
+		};
+
+		__overrides__ {
+			addr = <0x00>;
+			cha_cfg = <0x00>;
+			cha_gain = <0x00>;
+			cha_datarate = <0x00>;
+			chb_cfg = <0x00>;
+			chb_gain = <0x00>;
+			chb_datarate = <0x00>;
+			chc_cfg = <0x00>;
+			chc_gain = <0x00>;
+			chc_datarate = <0x00>;
+			chd_cfg = <0x00>;
+			chd_gain = <0x00>;
+			chd_datarate = <0x00>;
+			i2c0 = <0x00>;
+			i2c_csi_dsi = <0x00>;
+			i2c3 = <0x00 0x0e>;
+			i2c4 = <0x00 0x0e>;
+			i2c5 = <0x00 0x0e>;
+			i2c6 = <0x00 0x0e>;
+		};
+	};
+};

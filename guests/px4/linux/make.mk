@@ -1,9 +1,9 @@
 linux_base_dir := $(bao_demos)/guests/px4/linux
 
-#linux_repo?=https://github.com/torvalds/linux.git
-#linux_version?=v6.1
-linux_repo?=https://github.com/raspberrypi/linux.git
-linux_version?=stable_20240529
+linux_repo?=https://github.com/torvalds/linux.git
+linux_version?=v6.10
+#linux_repo?=https://github.com/raspberrypi/linux.git
+#linux_version?=stable_20240529
 #linux_version?=stable_20240124
 linux_src:=$(wrkdir_src)/linux-$(linux_version)
 linux_cfg_frag:=$(wildcard $(linux_base_dir)/configs/base.config\
@@ -15,10 +15,13 @@ export BAO_DEMOS_LINUX_CFG_FRAG=$(linux_cfg_frag)
 
 $(linux_src):
 	git clone --depth 1 --branch $(linux_version) $(linux_repo) $(linux_src)
+	sed -i '713i\{ .name = "spidev" },' $(linux_src)/drivers/spi/spidev.c
 #git -C $(linux_src) apply $(linux_patches)
 
 buildroot_repo:=https://github.com/buildroot/buildroot.git
-buildroot_version:=2024.02.3
+#buildroot_version:=2024.02.3
+#buildroot_version:=2024.05.2
+buildroot_version:=2024.08-rc2
 #buildroot_version:=2022.11
 buildroot_src:=$(wrkdir_src)/buildroot-$(ARCH)-$(linux_version)
 buildroot_defcfg:=$(linux_base_dir)/buildroot/$(ARCH).config

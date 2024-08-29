@@ -10,7 +10,7 @@
 	compatible = "raspberrypi,4-model-b\0brcm,bcm2711";
 
 
-	regulator-sd-vcc {
+	sd_vcc_reg: regulator-sd-vcc {
 		regulator-max-microvolt = <0x325aa0>;
 		regulator-boot-on;
 		gpio = <&expgpio 0x06 0x00>;
@@ -46,7 +46,7 @@
 		phandle = <0xe2>;
 	};
 
-	regulator-sd-io-1v8 {
+	sd_io_1v8_reg: regulator-sd-io-1v8 {
 		regulator-max-microvolt = <0x325aa0>;
 		regulator-boot-on;
 		regulator-settling-time-us = <0x1388>;
@@ -60,10 +60,41 @@
 		gpios = <&expgpio 0x04 0x00>;
 	};
 
+/**< AXI */
+//	axi {
+//		vc_mem {
+//			reg = <0x3ec00000 0x40000000 0xc0000000>;
+//		};
+//	};
+
 	zone_dma {
 		dma-ranges = <0x00 0x00 0x00 0x40000000>;
 		#address-cells = <0x01>;
 		#size-cells = <0x01>;
+	};
+
+/**< V3DBUS */
+
+	v3dbus: v3dbus {
+		dma-ranges = <0x00 0x00 0x00 0x04 0x00>;
+		#address-cells = <0x01>;
+		#size-cells = <0x02>;
+		compatible = "simple-bus";
+		ranges = <0x7c500000 0x00 0xfc500000 0x00 0x3300000 0x40000000 0x00 0xff800000 0x00 0x800000>;
+		phandle = <0xf1>;
+
+	v3d:	v3d@7ec04000 {
+			power-domains = <0x49 0x01>;
+			reg-names = "hub\0core0";
+			resets = <0x49 0x00>;
+			interrupts = <0x00 0x4a 0x04>;
+			clocks = <&firmware_clocks 0x05>;
+			compatible = "brcm,2711-v3d";
+			status = "okay";
+			reg = <0x7ec00000 0x00 0x4000 0x7ec04000 0x00 0x4000>;
+			phandle = <0xf2>;
+			clocks-names = "v3d";
+		};
 	};
 
  aliases:	aliases {
@@ -76,13 +107,27 @@
 		i2c10 = &i2c_csi_dsi;
 		//cam0_reg = &cam_dummy_reg;
 		vchiq = &mailbox;
+		mmc0 = &emmc2;
 		phandle = <0xcc>;
 	};
 
  chosen:	chosen {
 		stdout-path = "serial5:115200n8";
-		bootargs = "coherent_pool=1M earlycon console=serial5,115200 clk_ignore_unused ip=192.168.42.15 carrier_timeout=0";
+		bootargs = "coherent_pool=1M earlycon console=serial5,115200 clk_ignore_unused ip=192.168.42.15 carrier_timeout=0 isolcpus=2";
 		phandle = <0x17>;
+
+		kaslr-seed = <0x00 0x00>;
+		//bootloader {
+		//	capabilities = <0x7f>;
+		//	build-timestamp = <0x63bef4a4>;
+		//	tryboot = <0x00>;
+		//	rsts = <0x1000>;
+		//	update-timestamp = <0x00>;
+		//	version = "8ba17717fbcedd4c3b6d4bce7e50c7af4155cba9";
+		//	boot-mode = <0x01>;
+		//	partition = <0x00>;
+		//};
+
 	};
 
  cpus:	cpus {
@@ -95,7 +140,7 @@
 			device_type = "cpu";
 			enable-method = "psci";
 			reg = <0x00>;
-			phandle = <0x2c>;
+			phandle = <0x39>;
 		};
 
 	cpu1:	cpu@1 {
@@ -103,7 +148,7 @@
 			device_type = "cpu";
 			enable-method = "psci";
 			reg = <0x01>;
-			phandle = <0x2d>;
+			phandle = <0x3a>;
 		};
 
 	cpu2:	cpu@2 {
@@ -111,7 +156,15 @@
 			device_type = "cpu";
 			enable-method = "psci";
 			reg = <0x02>;
-			phandle = <0x2e>;
+			phandle = <0x3b>;
+		};
+
+	cpu3:	cpu@3 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x03>;
+			phandle = <0x3c>;
 		};
 	};
 
@@ -124,18 +177,20 @@
 	memory@0 {
 		device_type = "memory";
 		reg = <0x00 0x00 0x3b400000 0x00 0x40000000 0xbc000000 0x01 0x00 0x80000000 0x01 0x80000000 0x80000000>;
+//		reg = <0x00 0x40000000 0xbc000000>;
 	};
 
-	arm-pmu {
-		interrupt-affinity = <0x39 0x3a 0x3b 0x3c>;
-		interrupts = <0x00 0x10 0x04 0x00 0x11 0x04 0x00 0x12 0x04 0x00 0x13 0x04>;
-		compatible = "arm,cortex-a72-pmu\0arm,armv8-pmuv3\0arm,cortex-a7-pmu";
-	};
+//	arm-pmu {
+//		interrupt-affinity = <0x39 0x3a 0x3b 0x3c>;
+//		interrupts = <0x00 0x10 0x04 0x00 0x11 0x04 0x00 0x12 0x04 0x00 0x13 0x04>;
+//		compatible = "arm,cortex-a72-pmu\0arm,armv8-pmuv3\0arm,cortex-a7-pmu";
+//	};
 
 
 clk_sc16is752:	sc16is752_spi1_0_clk {
 #clock-cells = <0x00>;
 	  clock-frequency = <0xe10000>;
+	  //clock-frequency = <0x010000>;
 	  compatible = "fixed-clock";
 	  phandle = <0xff>;
 	};
@@ -175,7 +230,7 @@ cam_dummy_reg:	cam_dummy_reg {
 		#address-cells = <0x02>;
 		#size-cells = <0x01>;
 		ranges;
-		phandle = <0x30>;
+		phandle = <0x5a>;
 
 		//linux,cma {
 		//	compatible = "shared-dma-pool";
@@ -216,8 +271,9 @@ cam_dummy_reg:	cam_dummy_reg {
 	};
 
 	timer {
-		compatible = "arm,armv8-timer";
+		arm,cpu-registers-not-fw-configured;
 		interrupts = <0x01 0x0d 0xf08 0x01 0x0e 0xf08 0x01 0x0b 0xf08 0x01 0x0a 0xf08>;
+		compatible = "arm,armv8-timer";
 	};
 
 	clocks {
@@ -276,6 +332,33 @@ cam_dummy_reg:	cam_dummy_reg {
 		phandle = <0x2a>;
 	};
 
+emmc2bus:	emmc2bus {
+		dma-ranges = <0x00 0x00 0x00 0x00 0xfc000000>;
+		#address-cells = <0x02>;
+		#size-cells = <0x01>;
+		compatible = "simple-bus";
+		ranges = <0x00 0x7e000000 0x00 0xfe000000 0x1800000>;
+		phandle = <0xe3>;
+
+/**< SD card reader:  
+ * cat /sys/block/mmcblk0/queue/scheduler 
+ * none [mq-deadline] kyber bfq 
+ */
+emmc2:		mmc@7e340000 {
+			compatible = "brcm,bcm2711-emmc2";
+			reg = <0x00 0x7e340000 0x100>;
+			mmc-ddr-3_3v;
+			interrupts = <0x00 0x7e 0x04>;
+			clocks = <&cprman 0x33>;
+			broken-cd;
+			vqmmc-supply = <&sd_io_1v8_reg>;
+			vmmc-supply = <&sd_vcc_reg>;
+			status = "okay";
+			phandle = <0x57>;
+		};
+	};
+
+
  soc:	soc {
 		compatible = "simple-bus";
 		#address-cells = <0x01>;
@@ -283,6 +366,132 @@ cam_dummy_reg:	cam_dummy_reg {
 		ranges = <0x7e000000 0x00 0xfe000000 0x1800000 0x7c000000 0x00 0xfc000000 0x2000000 0x40000000 0x00 0xff800000 0x800000>;
 		dma-ranges = <0xc0000000 0x00 0x00 0x40000000 0x7c000000 0x00 0xfc000000 0x3800000>;
 		phandle = <0x5f>;
+
+
+		watchdog@7e100000 {
+			system-power-controller;
+			#reset-cells = <0x01>;
+			clock-names = "v3d\0peri_image\0h264\0isp";
+			reg-names = "pm\0asb\0rpivid_asb";
+			clocks = <&cprman 0x15 &cprman 0x1d &cprman 0x17 &cprman 0x16>;
+			#power-domain-cells = <0x01>;
+			compatible = "brcm,bcm2711-pm\0brcm,bcm2835-pm-wdt";
+			reg = <0x7e100000 0x114 0x7e00a000 0x24 0x7ec11000 0x20>;
+			phandle = <0x49>;
+		};
+
+
+		// mailbox@7e00b840 {
+		// 	pinctrl-names = "default";
+		// 	pinctrl-0 = <0x36>;
+		// 	interrupts = <0x00 0x22 0x04>;
+		// 	compatible = "brcm,bcm2711-vchiq";
+		// 	reg = <0x7e00b840 0x3c>;
+		// 	phandle = <0xde>;
+		// };
+
+		gpiomem {
+			compatible = "brcm,bcm2835-gpiomem";
+			reg = <0x7e200000 0x1000>;
+		};
+
+		//nvmem_otp {
+		//	compatible = "raspberrypi,rpi-otp";
+		//	status = "okay";
+		//	firmware = <&firmware>;
+		//	reg = <0x00 0xa6>;
+		//	phandle = <0xe1>;
+		//};
+
+
+	//i2c21:	i2c@7ef09500 {
+	//		reg-names = "bsc\0auto-i2c";
+	//		clock-frequency = <0x17cdc>;
+	//		compatible = "brcm,bcm2711-hdmi-i2c";
+	//		status = "okay";
+	//		reg = <0x7ef09500 0x100 0x7ef05b00 0x300>;
+	//		phandle = <0x30>;
+	//	};
+
+
+/**< Transposer: used in Video pipeline */
+//	txp:	txp@7e004000 {
+//			interrupts = <0x00 0x4b 0x04>;
+//			compatible = "brcm,bcm2835-txp";
+//			status = "okay";
+//			reg = <0x7e004000 0x20>;
+//			phandle = <0x63>;
+//		};
+
+
+/**< HW Video scaling */
+//	hvs:	hvs@7e400000 {
+//			interrupts = <0x00 0x61 0x04>;
+//			clocks = <0x14 0x04>;
+//			compatible = "brcm,bcm2711-hvs";
+//			status = "okay";
+//			reg = <0x7e400000 0x8000>;
+//			phandle = <0xc2>;
+//		};
+
+
+/**< Local Interrupt */
+//	local_intc:	interrupt-controller@40000000 {
+//			compatible = "brcm,bcm2836-l1-intc";
+//			reg = <0x40000000 0x100>;
+//			phandle = <0xc4>;
+//		};
+
+/**< AVS: Audio Video Synchronization */
+//		avs-monitor@7d5d2000 {
+//			compatible = "brcm,bcm2711-avs-monitor\0syscon\0simple-mfd";
+//			reg = <0x7d5d2000 0xf00>;
+//			phandle = <0xc5>;
+//
+//			thermal {
+//				#thermal-sensor-cells = <0x00>;
+//				compatible = "brcm,bcm2711-thermal";
+//				phandle = <0x02>;
+//			};
+//		};
+
+/**< RNG: Random Number Generator */
+//		rng@7e104000 {
+//			compatible = "brcm,bcm2711-rng200";
+//			status = "okay";
+//			reg = <0x7e104000 0x28>;
+//			phandle = <0x4a>;
+//		};
+
+/**< Always-on Interrupt controller */
+//	aon_intr:	interrupt-controller@7ef00100 {
+//			interrupts = <0x00 0x60 0x01>;
+//			compatible = "brcm,bcm2711-l2-intc\0brcm,l2-intc";
+//			#interrupt-cells = <0x01>;
+//			status = "okay";
+//			reg = <0x7ef00100 0x30>;
+//			phandle = <0x2c>;
+//			interrupt-controller;
+//		};
+
+
+/**< NVMEM: Non-volatile memory */
+//		nvmem_priv {
+//			compatible = "raspberrypi,rpi-otp";
+//			status = "okay";
+//			firmware = <&firmware>;
+//			reg = <0x03 0x08>;
+//			phandle = <0x56>;
+//		};
+//
+//		nvmem_cust {
+//			compatible = "raspberrypi,rpi-otp";
+//			status = "okay";
+//			firmware = <&firmware>;
+//			reg = <0x01 0x08>;
+//			phandle = <0x55>;
+//		};
+
 
 	gicv2:	interrupt-controller@40041000 {
 			interrupts = <0x01 0x09 0xf04>;
@@ -383,6 +592,19 @@ cam_dummy_reg:	cam_dummy_reg {
 			phandle = <0x35>;
 		};
 
+
+//	i2s:	i2s@7e203000 {
+//			pinctrl-names = "default";
+//			pinctrl-0 = <&i2s_pins>;
+//			clocks = <&i2s 0x1f>;
+//			dma-names = "tx\0rx";
+//			#sound-dai-cells = <0x00>;
+//			compatible = "brcm,bcm2835-i2s";
+//			status = "disabled";
+//			reg = <0x7e203000 0x24>;
+//			phandle = <0x45>;
+//			dmas = <&dma 0x02 &dma 0x03>;
+//		};
 
 	gpio:	gpio@7e200000 {
 			compatible = "brcm,bcm2711-gpio";
@@ -649,7 +871,7 @@ cam_dummy_reg:	cam_dummy_reg {
 				brcm,pins = <0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f 0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17 0x18 0x19 0x1a 0x1b>;
 			};
 
-			spi3_cs_pins {
+		spi3_cs_pins:	spi3_cs_pins {
 				brcm,function = <0x01>;
 				phandle = <0x1d>;
 				brcm,pins = <0x00 0x18>;
@@ -750,7 +972,7 @@ cam_dummy_reg:	cam_dummy_reg {
 				brcm,pins = <0x08 0x09>;
 			};
 
-			spi3_pins {
+		spi3_pins:	spi3_pins {
 				brcm,function = <0x07>;
 				phandle = <0x1c>;
 				brcm,pins = <0x01 0x02 0x03>;
@@ -1086,7 +1308,7 @@ cam_dummy_reg:	cam_dummy_reg {
 				};
 			};
 
-			i2s {
+		i2s_pins:	i2s {
 				brcm,function = <0x04>;
 				phandle = <0x0d>;
 				brcm,pins = <0x12 0x13 0x14 0x15>;
@@ -1504,11 +1726,26 @@ cam_dummy_reg:	cam_dummy_reg {
 				gpio-controller;
 				#gpio-cells = <0x02>;
 				spi-max-frequency = "\0=\t";
-				//spi-max-frequency = "0x09";
+				//spi-max-frequency = "10";
+				//spi-max-frequency = "400";
 				phandle = <0x100>;
 			};
 		};
 
+
+
+//	spi3:	spi@7e204600 {
+//			pinctrl-names = "default";
+//			#address-cells = <0x01>;
+//			pinctrl-0 = <&spi3_pins &spi3_cs_pins>;
+//			interrupts = <0x00 0x76 0x04>;
+//			clocks = <&cprman 0x14>;
+//			#size-cells = <0x00>;
+//			compatible = "brcm,bcm2835-spi";
+//			status = "disabled";
+//			reg = <0x7e204600 0x200>;
+//			phandle = <0xca>;
+//		};
 
 		spi0: spi@7e204000 {
 			compatible = "brcm,bcm2835-spi";
@@ -1723,7 +1960,7 @@ cam_dummy_reg:	cam_dummy_reg {
 		#size-cells = <0x02>;
 		dma-ranges = <0x00 0x00 0x00 0x00 0x04 0x00>;
 		ranges = <0x00 0x7c000000 0x00 0xfc000000 0x00 0x3800000 0x00 0x40000000 0x00 0xff800000 0x00 0x800000 0x06 0x00 0x06 0x00 0x00 0x40000000 0x00 0x00 0x00 0x00 0x00 0xfc000000>;
-		phandle = <0x3a>;
+		phandle = <0xe5>;
 
 	genet:	ethernet@7d580000 {
 			local-mac-address = [dc a6 32 a3 9c 57];
@@ -1735,7 +1972,7 @@ cam_dummy_reg:	cam_dummy_reg {
 			status = "okay";
 			phy-handle = <&phy>;
 			phy-mode = "rgmii-rxid";
-			phandle = <0x3b>;
+			phandle = <0xe6>;
 
 		genet_mdio:	mdio@e14 {
 				compatible = "brcm,genet-mdio-v5";
@@ -1743,12 +1980,12 @@ cam_dummy_reg:	cam_dummy_reg {
 				reg-names = "mdio";
 				#address-cells = <0x00>;
 				#size-cells = <0x01>;
-				phandle = <0x3c>;
+				phandle = <0xe7>;
 
 			phy:	ethernet-phy@1 {
 					reg = <0x01>;
 					led-modes = <0x00 0x08>;
-					phandle = <0x02>;
+					phandle = <0x40>;
 				};
 			};
 		};
