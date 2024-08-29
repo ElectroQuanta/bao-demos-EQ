@@ -74,28 +74,27 @@
 	};
 
 /**< V3DBUS */
-
-	v3dbus: v3dbus {
-		dma-ranges = <0x00 0x00 0x00 0x04 0x00>;
-		#address-cells = <0x01>;
-		#size-cells = <0x02>;
-		compatible = "simple-bus";
-		ranges = <0x7c500000 0x00 0xfc500000 0x00 0x3300000 0x40000000 0x00 0xff800000 0x00 0x800000>;
-		phandle = <0xf1>;
-
-	v3d:	v3d@7ec04000 {
-			power-domains = <0x49 0x01>;
-			reg-names = "hub\0core0";
-			resets = <0x49 0x00>;
-			interrupts = <0x00 0x4a 0x04>;
-			clocks = <&firmware_clocks 0x05>;
-			compatible = "brcm,2711-v3d";
-			status = "okay";
-			reg = <0x7ec00000 0x00 0x4000 0x7ec04000 0x00 0x4000>;
-			phandle = <0xf2>;
-			clocks-names = "v3d";
-		};
-	};
+//	v3dbus: v3dbus {
+//		dma-ranges = <0x00 0x00 0x00 0x04 0x00>;
+//		#address-cells = <0x01>;
+//		#size-cells = <0x02>;
+//		compatible = "simple-bus";
+//		ranges = <0x7c500000 0x00 0xfc500000 0x00 0x3300000 0x40000000 0x00 0xff800000 0x00 0x800000>;
+//		phandle = <0xf1>;
+//
+//	v3d:	v3d@7ec04000 {
+//			power-domains = <0x49 0x01>;
+//			reg-names = "hub\0core0";
+//			resets = <0x49 0x00>;
+//			interrupts = <0x00 0x4a 0x04>;
+//			clocks = <&firmware_clocks 0x05>;
+//			compatible = "brcm,2711-v3d";
+//			status = "okay";
+//			reg = <0x7ec00000 0x00 0x4000 0x7ec04000 0x00 0x4000>;
+//			phandle = <0xf2>;
+//			clocks-names = "v3d";
+//		};
+//	};
 
  aliases:	aliases {
 		serial0 = &uart0;
@@ -107,7 +106,7 @@
 		i2c10 = &i2c_csi_dsi;
 		//cam0_reg = &cam_dummy_reg;
 		vchiq = &mailbox;
-		mmc0 = &emmc2;
+		//mmc0 = &emmc2;
 		phandle = <0xcc>;
 	};
 
@@ -332,31 +331,31 @@ cam_dummy_reg:	cam_dummy_reg {
 		phandle = <0x2a>;
 	};
 
-emmc2bus:	emmc2bus {
-		dma-ranges = <0x00 0x00 0x00 0x00 0xfc000000>;
-		#address-cells = <0x02>;
-		#size-cells = <0x01>;
-		compatible = "simple-bus";
-		ranges = <0x00 0x7e000000 0x00 0xfe000000 0x1800000>;
-		phandle = <0xe3>;
-
-/**< SD card reader:  
- * cat /sys/block/mmcblk0/queue/scheduler 
- * none [mq-deadline] kyber bfq 
- */
-emmc2:		mmc@7e340000 {
-			compatible = "brcm,bcm2711-emmc2";
-			reg = <0x00 0x7e340000 0x100>;
-			mmc-ddr-3_3v;
-			interrupts = <0x00 0x7e 0x04>;
-			clocks = <&cprman 0x33>;
-			broken-cd;
-			vqmmc-supply = <&sd_io_1v8_reg>;
-			vmmc-supply = <&sd_vcc_reg>;
-			status = "okay";
-			phandle = <0x57>;
-		};
-	};
+//emmc2bus:	emmc2bus {
+//		dma-ranges = <0x00 0x00 0x00 0x00 0xfc000000>;
+//		#address-cells = <0x02>;
+//		#size-cells = <0x01>;
+//		compatible = "simple-bus";
+//		ranges = <0x00 0x7e000000 0x00 0xfe000000 0x1800000>;
+//		phandle = <0xe3>;
+//
+///**< SD card reader:  
+// * cat /sys/block/mmcblk0/queue/scheduler 
+// * none [mq-deadline] kyber bfq 
+// */
+//emmc2:		mmc@7e340000 {
+//			compatible = "brcm,bcm2711-emmc2";
+//			reg = <0x00 0x7e340000 0x100>;
+//			mmc-ddr-3_3v;
+//			interrupts = <0x00 0x7e 0x04>;
+//			clocks = <&cprman 0x33>;
+//			broken-cd;
+//			vqmmc-supply = <&sd_io_1v8_reg>;
+//			vmmc-supply = <&sd_vcc_reg>;
+//			status = "okay";
+//			phandle = <0x57>;
+//		};
+//	};
 
 
  soc:	soc {
@@ -368,17 +367,17 @@ emmc2:		mmc@7e340000 {
 		phandle = <0x5f>;
 
 
-		watchdog@7e100000 {
-			system-power-controller;
-			#reset-cells = <0x01>;
-			clock-names = "v3d\0peri_image\0h264\0isp";
-			reg-names = "pm\0asb\0rpivid_asb";
-			clocks = <&cprman 0x15 &cprman 0x1d &cprman 0x17 &cprman 0x16>;
-			#power-domain-cells = <0x01>;
-			compatible = "brcm,bcm2711-pm\0brcm,bcm2835-pm-wdt";
-			reg = <0x7e100000 0x114 0x7e00a000 0x24 0x7ec11000 0x20>;
-			phandle = <0x49>;
-		};
+//		watchdog@7e100000 {
+//			system-power-controller;
+//			#reset-cells = <0x01>;
+//			clock-names = "v3d\0peri_image\0h264\0isp";
+//			reg-names = "pm\0asb\0rpivid_asb";
+//			clocks = <&cprman 0x15 &cprman 0x1d &cprman 0x17 &cprman 0x16>;
+//			#power-domain-cells = <0x01>;
+//			compatible = "brcm,bcm2711-pm\0brcm,bcm2835-pm-wdt";
+//			reg = <0x7e100000 0x114 0x7e00a000 0x24 0x7ec11000 0x20>;
+//			phandle = <0x49>;
+//		};
 
 
 		// mailbox@7e00b840 {
@@ -390,10 +389,10 @@ emmc2:		mmc@7e340000 {
 		// 	phandle = <0xde>;
 		// };
 
-		gpiomem {
-			compatible = "brcm,bcm2835-gpiomem";
-			reg = <0x7e200000 0x1000>;
-		};
+//		gpiomem {
+//			compatible = "brcm,bcm2835-gpiomem";
+//			reg = <0x7e200000 0x1000>;
+//		};
 
 		//nvmem_otp {
 		//	compatible = "raspberrypi,rpi-otp";
@@ -1925,29 +1924,29 @@ emmc2:		mmc@7e340000 {
 // PWM
 
 
-	pwm:	pwm@7e20c000 {
-			assigned-clocks = <&cprman 0x1e>;
-			assigned-clock-rates = <0x2faf080>;
-			clocks = <&cprman 0x1e>;
-			#pwm-cells = <0x03>;
-			compatible = "brcm,bcm2835-pwm";
-			status = "disabled";
-			reg = <0x7e20c000 0x28>;
-			phandle = <0xc1>;
-		};
-
-	pwm1:	pwm@7e20c800 {
-			pinctrl-names = "default";
-			pinctrl-0 = <&pwm1_0_gpio40 &pwm1_1_gpio41>;
-			assigned-clocks = <&cprman 0x1e>;
-			assigned-clock-rates = <0x2faf080>;
-			clocks = <&cprman 0x1e>;
-			#pwm-cells = <0x03>;
-			compatible = "brcm,bcm2835-pwm";
-			status = "disabled";
-			reg = <0x7e20c800 0x28>;
-			phandle = <0xd5>;
-		};
+//	pwm:	pwm@7e20c000 {
+//			assigned-clocks = <&cprman 0x1e>;
+//			assigned-clock-rates = <0x2faf080>;
+//			clocks = <&cprman 0x1e>;
+//			#pwm-cells = <0x03>;
+//			compatible = "brcm,bcm2835-pwm";
+//			status = "disabled";
+//			reg = <0x7e20c000 0x28>;
+//			phandle = <0xc1>;
+//		};
+//
+//	pwm1:	pwm@7e20c800 {
+//			pinctrl-names = "default";
+//			pinctrl-0 = <&pwm1_0_gpio40 &pwm1_1_gpio41>;
+//			assigned-clocks = <&cprman 0x1e>;
+//			assigned-clock-rates = <0x2faf080>;
+//			clocks = <&cprman 0x1e>;
+//			#pwm-cells = <0x03>;
+//			compatible = "brcm,bcm2835-pwm";
+//			status = "disabled";
+//			reg = <0x7e20c800 0x28>;
+//			phandle = <0xd5>;
+//		};
 
 //================ END SOC ======================
 	};
