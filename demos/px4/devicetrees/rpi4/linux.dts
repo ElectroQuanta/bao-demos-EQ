@@ -98,7 +98,7 @@
 
  aliases:	aliases {
 		serial0 = &uart0;
-		serial1 = &uart1;
+		//serial1 = &uart1;
 		serial5 = &uart5;
 		ethernet0 = &genet;
 		i2c = &i2c_arm;
@@ -1673,18 +1673,18 @@ cam_dummy_reg:	cam_dummy_reg {
 			phandle = <0x11>;
 		};
 
-	uart1:	serial@7e215040 {
-			compatible = "brcm,bcm2835-aux-uart";
-			reg = <0x7e215040 0x40>;
-			interrupts = <0x00 0x5d 0x04>;
-			//clocks = <&clk_aux_uart 0x00>;
-			clocks = <&aux 0x00>;
-			status = "disabled";
-			pinctrl-names = "default";
-			pinctrl-0 = <&uart1_pins>;
-			skip-init;
-			phandle = <0x44>;
-		};
+//	uart1:	serial@7e215040 {
+//			compatible = "brcm,bcm2835-aux-uart";
+//			reg = <0x7e215040 0x40>;
+//			interrupts = <0x00 0x5d 0x04>;
+//			//clocks = <&clk_aux_uart 0x00>;
+//			clocks = <&aux 0x00>;
+//			status = "disabled";
+//			pinctrl-names = "default";
+//			pinctrl-0 = <&uart1_pins>;
+//			skip-init;
+//			phandle = <0x44>;
+//		};
 
 	uart5:	serial@7e201a00 {
 			compatible = "arm,pl011\0arm,primecell";
