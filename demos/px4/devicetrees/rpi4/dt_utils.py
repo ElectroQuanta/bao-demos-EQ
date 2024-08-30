@@ -20,3 +20,13 @@ pa: returned
 """
 def calc_pa(va, va_start, pa_start):
     return hex(((va - va_start) + pa_start))
+
+"""
+Calculate the size in GB
+1 byte = 8 bits
+1 KB = 2^10 = 1024 bytes
+1 MB = (2^10)^2 = 1024 ^ 2
+1 GB = (2^10)^3 = 1024 ^ 3
+"""
+def size_MB(val):
+    return (val / (1024 ** 2))

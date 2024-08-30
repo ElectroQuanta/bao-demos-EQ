@@ -1,7 +1,13 @@
 #include <config.h>
 
-VM_IMAGE(linux_image, XSTR(BAO_DEMOS_WRKDIR_IMGS/linux.bin));
-#define LINUX_IMG_ENTRY 0x40000000
+VM_IMAGE(vm1, XSTR(BAO_DEMOS_WRKDIR_IMGS/linux.bin))
+//#define VM1_ENTRY 0x80000000
+#define RPI4_MEM_GB 8
+#define VM1_ENTRY     0x20000000ULL
+#define VM1_MEM1_BASE 0x80000ULL
+#define VM1_MEM1_SIZE (0x40000000ULL - 0x80000ULL - 0x4c00000ULL)
+#define VM1_MEM2_BASE 0x40000000ULL
+#define VM1_MEM2_SIZE (((RPI4_MEM_GB-1) * 0x40000000ULL) - 0x4000000ULL)
 
 struct config config = {
     
@@ -13,17 +19,19 @@ struct config config = {
  //   },
     
     .vmlist_size = 1,
-    .vmlist = {
-        { 
-            .image = VM_IMAGE_BUILTIN(linux_image, LINUX_IMG_ENTRY),
-
-            .entry = LINUX_IMG_ENTRY,
+    //.vmlist = (struct vm_config[])
+    .vmlist =
+	{
+/**< VM1 */
+	  {
+            .image = VM_IMAGE_BUILTIN(vm1, VM1_ENTRY),
+            .entry = VM1_ENTRY,
 
             .platform = {
                 .cpu_num = 4,
                 
                 //.region_num = 3,
-                .region_num = 1,
+                .region_num = 2,
                 .regions =  (struct vm_mem_region[]) {
                     //{
                     //    .base = 0x0,
@@ -44,10 +52,16 @@ struct config config = {
                     //    .phys = 0x100000000,
                     //},
                     {
-                        .base = LINUX_IMG_ENTRY,
-                        .size = 0x80000000
+                        .base = VM1_MEM1_BASE,
+                        .size = VM1_MEM1_SIZE,
                         .place_phys = true,
-                        .phys = 0x0
+                        .phys = VM1_MEM1_BASE
+                    },
+                    {
+                        .base = VM1_MEM2_BASE,
+                        .size = VM1_MEM2_SIZE,
+                        .place_phys = true,
+                        .phys = VM1_MEM2_BASE
                     },
                 },
 
@@ -62,6 +76,7 @@ struct config config = {
               //      }
               //  },
 
+                //.dev_num = 17,
                 .dev_num = 17,
                 .devs =  (struct vm_dev_region[]) {
 /**< Arch timer */
@@ -78,6 +93,14 @@ struct config config = {
                         .size = 0x10000,
                         .interrupt_num = 2,
                         .interrupts = (irqid_t[]) {189, 190}  
+                    },
+/**< UART 5 (ttyAMA5) */
+                    {
+                        .pa = 0xfe201a00,
+                        .va = 0xfe201a00,
+                        .size = 0x200,
+                        .interrupt_num = 1,
+                        .interrupts = (irqid_t[]) {153}  
                     },
 /**< Clock manager (cprman) */
                     {
@@ -122,16 +145,8 @@ struct config config = {
                         .pa = 0xfe201000,
                         .va = 0xfe201000,
                         .size = 0x200,
-                        .interrupt_num = 1,
-                        .interrupts = (irqid_t[]) {153}  
-                    },
-/**< UART 5 (ttyAMA5) */
-                    {
-                        .pa = 0xfe201a00,
-                        .va = 0xfe201a00,
-                        .size = 0x200,
-                        .interrupt_num = 1,
-                        .interrupts = (irqid_t[]) {153}  
+                   //     .interrupt_num = 1,
+                   //     .interrupts = (irqid_t[]) {153}  
                     },
 /**< aux (Auxiliary clock) */
                     {
@@ -166,8 +181,8 @@ struct config config = {
                         .pa = 0xfe804000,
                         .va = 0xfe804000,
                         .size = 0x1000,
-                        .interrupt_num = 1,
-                        .interrupts = (irqid_t[]) {149}  
+                   //     .interrupt_num = 1,
+                   //     .interrupts = (irqid_t[]) {149}  
                     },
 /**< i2c0if */
                     {
@@ -190,8 +205,8 @@ struct config config = {
                         .pa = 0xfe802004,
                         .va = 0xfe802004,
                         .size = 0x04,
-                        .interrupt_num = 1,
-                        .interrupts = (irqid_t[]) {135}  
+                  //      .interrupt_num = 1,
+                  //      .interrupts = (irqid_t[]) {135}  
                     },
 
 /**< Devices end */
@@ -200,10 +215,10 @@ struct config config = {
                 .arch = {
                     .gic = {
                         .gicd_addr = 0xff841000,
-                        .gicd_addr = 0xff842000,
+                        .gicc_addr = 0xff842000,
                     }
                 }
             },
-        },
-    },
+	  },
+	}
 };

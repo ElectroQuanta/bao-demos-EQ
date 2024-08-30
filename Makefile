@@ -79,9 +79,9 @@ export BAO_DEMOS_WRKDIR_PLAT=$(wrkdir_plat_imgs)
 
 all: platform 
 
-#bao_repo:=https://github.com/bao-project/bao-hypervisor
-bao_repo:=https://github.com/ElectroQuanta/bao-hypervisor-porting
-bao_version:=main
+bao_repo:=https://github.com/bao-project/bao-hypervisor
+#bao_repo:=https://github.com/ElectroQuanta/bao-hypervisor-porting
+bao_version:=v1.0.0
 bao_src:=$(wrkdir_src)/bao
 bao_cfg_repo:=$(wrkdir_demo_imgs)/config
 wrkdirs+=$(bao_cfg_repo)
@@ -101,9 +101,10 @@ $(bao_src):
 	git clone --branch $(bao_version) $(bao_repo) $(bao_src)
 	git -C $(bao_src) submodule init
 	git -C $(bao_src) submodule update --recursive
+	sed -i '20i\void uart_putc(volatile bao_uart_t *, const char );' $(bao_src)/src/core/console.c
 
 $(bao_cfg): | $(bao_cfg_repo)
-	cp -L $(bao_demos)/demos/$(DEMO)/configs/$(PLATFORM).c $(bao_cfg)
+	cp -vL $(bao_demos)/demos/$(DEMO)/configs/$(PLATFORM).c $(bao_cfg)
 
 bao $(bao_image): $(guest_images) $(bao_cfg) $(bao_src) 
 	$(MAKE) -C $(bao_src)\
@@ -141,6 +142,12 @@ uboot_distclean:
 	$(MAKE) -C $(wrkdir_src)/u-boot distclean
 
 platform_clean: firmware_clean atf_clean uboot_clean
+
+bao_distclean: bao_clean_cfg
+	-@rm -vrf $(wrkdir_src)/bao
+
+bao_clean_cfg:
+	-@rm -vrf $(bao_cfg_repo)
 
 guests_clean bao_clean:
 
