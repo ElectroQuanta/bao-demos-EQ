@@ -26,6 +26,9 @@
 
 set AIRFRAME none
 
+# GROUP: Airship
+
+
 # GROUP: Autogyro
 
 
@@ -84,6 +87,12 @@ set AIRFRAME none
 
 
 # GROUP: Rover
+
+
+# GROUP: Underwater Robot
+
+
+# GROUP: Vectored 6 DOF UUV
 
 
 # GROUP: Simulation

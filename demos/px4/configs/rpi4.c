@@ -2,16 +2,17 @@
 
 VM_IMAGE(vm1, XSTR(BAO_DEMOS_WRKDIR_IMGS/linux.bin))
 //#define VM1_ENTRY 0x80000000
-#define RPI4_MEM_GB 8
+#define RPI4_MEM_GB_CFG 8
 #define VM1_ENTRY     0x20000000ULL
-#define VM1_MEM1_BASE 0x80000ULL
-#define VM1_MEM1_SIZE (0x40000000ULL - 0x80000ULL - 0x4c00000ULL)
+#define VM1_MEM1_BASE 0x00080000ULL
 #define VM1_MEM2_BASE 0x40000000ULL
-#define VM1_MEM2_SIZE (((RPI4_MEM_GB-1) * 0x40000000ULL) - 0x4000000ULL)
+#define VM1_MEM1_SIZE (VM1_MEM2_BASE - VM1_MEM1_BASE - 0x4c00000ULL)
+//#define VM1_MEM2_SIZE (((RPI4_MEM_GB_CFG-1) * 0x40000000ULL) - 0x4000000ULL)
+#define VM1_MEM2_SIZE 0x80000000ULL
 
 struct config config = {
     
-//    CONFIG_HEADER /**< Legacy: not required anymore */
+    CONFIG_HEADER /**< Legacy: not required anymore */
 
  //   .shmemlist_size = 1,
  //   .shmemlist = (struct shmem[]) {
@@ -24,14 +25,22 @@ struct config config = {
 	{
 /**< VM1 */
 	  {
-            .image = VM_IMAGE_BUILTIN(vm1, VM1_ENTRY),
+            //.image = VM_IMAGE_BUILTIN(vm1, VM1_ENTRY),
+
+            .image = {
+                .base_addr = VM1_ENTRY,
+                .load_addr = VM_IMAGE_OFFSET(vm1),
+                .size = VM_IMAGE_SIZE(vm1)
+            },
+
             .entry = VM1_ENTRY,
+
 
             .platform = {
                 .cpu_num = 4,
                 
                 //.region_num = 3,
-                .region_num = 2,
+                .region_num = 3,
                 .regions =  (struct vm_mem_region[]) {
                     //{
                     //    .base = 0x0,
@@ -58,11 +67,23 @@ struct config config = {
                         .phys = VM1_MEM1_BASE
                     },
                     {
-                        .base = VM1_MEM2_BASE,
-                        .size = VM1_MEM2_SIZE,
+                        .base = 0x40000000,
+                        .size = 0xbc000000,
                         .place_phys = true,
-                        .phys = VM1_MEM2_BASE
+                        .phys = 0x40000000
                     },
+                    {
+                        .base = 0x100000000,
+                        .size = 0x80000000,
+                        .place_phys = true,
+                        .phys = 0x100000000,
+                    },
+                    //{
+                    //    .base = VM1_MEM2_BASE,
+                    //    .size = VM1_MEM2_SIZE,
+                    //    .place_phys = true,
+                    //    .phys = VM1_MEM2_BASE
+                    //},
                 },
 
               // .ipc_num = 1,

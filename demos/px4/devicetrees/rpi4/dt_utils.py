@@ -30,3 +30,12 @@ Calculate the size in GB
 """
 def size_MB(val):
     return (val / (1024 ** 2))
+
+
+def mem_region(st_addr, sz):
+    end_addr = st_addr + sz - 1
+    return {
+        "start_address": hex(st_addr),
+        "end_address": hex(end_addr),
+        "size": hex(sz)
+    }

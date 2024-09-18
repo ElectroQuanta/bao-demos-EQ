@@ -26,6 +26,16 @@
 
 set AIRFRAME none
 
+# GROUP: Airship
+
+#
+# Cloudship
+if param compare SYS_AUTOSTART 2507
+then
+	set AIRFRAME 2507_cloudship
+fi
+
+
 # GROUP: Autogyro
 
 #
@@ -143,7 +153,7 @@ fi
 # GROUP: Quadrotor +
 
 #
-# Generic Quad + geometry
+# Generic 10" Quad + geometry
 if param compare SYS_AUTOSTART 5001
 then
 	set AIRFRAME 5001_quad_+
@@ -151,6 +161,13 @@ fi
 
 
 # GROUP: Quadrotor H
+
+#
+# Reaper 500 Quad
+if param compare SYS_AUTOSTART 4040
+then
+	set AIRFRAME 4040_reaper
+fi
 
 #
 # BetaFPV Beta75X 2S Brushless Whoop
@@ -261,10 +278,10 @@ then
 fi
 
 #
-# Droneblocks DEXI 5
-if param compare SYS_AUTOSTART 4601
+# Crazyflie 2
+if param compare SYS_AUTOSTART 4900
 then
-	set AIRFRAME 4601_droneblocks_dexi_5
+	set AIRFRAME 4900_crazyflie
 fi
 
 #
@@ -352,10 +369,44 @@ then
 fi
 
 #
+# Aion Robotics R1 UGV
+if param compare SYS_AUTOSTART 50003
+then
+	set AIRFRAME 50003_aion_robotics_r1_rover
+fi
+
+#
 # NXP Cup car: DF Robot GPX
 if param compare SYS_AUTOSTART 50004
 then
 	set AIRFRAME 50004_nxpcup_car_dfrobot_gpx
+fi
+
+
+# GROUP: Underwater Robot
+
+#
+# Generic Underwater Robot
+if param compare SYS_AUTOSTART 60000
+then
+	set AIRFRAME 60000_uuv_generic
+fi
+
+#
+# HippoCampus UUV (Unmanned Underwater Vehicle)
+if param compare SYS_AUTOSTART 60001
+then
+	set AIRFRAME 60001_uuv_hippocampus
+fi
+
+
+# GROUP: Vectored 6 DOF UUV
+
+#
+# BlueROV2 (Heavy Configuration)
+if param compare SYS_AUTOSTART 60002
+then
+	set AIRFRAME 60002_uuv_bluerov2_heavy
 fi
 
 

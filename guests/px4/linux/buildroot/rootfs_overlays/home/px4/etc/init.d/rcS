@@ -93,14 +93,6 @@ then
 		fi
 	fi
 
-	# Check for an update of the ext_autostart folder, and replace the old one with it
-	if [ -e /fs/microsd/ext_autostart_new ]
-	then
-		echo "Updating external autostart files"
-		rm -r $SDCARD_EXT_PATH
-		mv /fs/microsd/ext_autostart_new $SDCARD_EXT_PATH
-	fi
-
 	set PARAM_FILE /fs/microsd/params
 	set PARAM_BACKUP_FILE "/fs/microsd/parameters_backup.bson"
 fi
@@ -170,7 +162,7 @@ else
 		param select-backup $PARAM_BACKUP_FILE
 	fi
 
-	if mft query -q -k MFT -s MFT_ETHERNET -v 1
+	if ver hwcmp PX4_FMU_V5X PX4_FMU_V6X ARK_FMU_V6X
 	then
 		netman update -i eth0
 	fi
@@ -274,9 +266,12 @@ else
 		. $FCONFIG
 	fi
 
-	if px4io supported
+	#
+	# Start IO for PWM output or RC input if enabled
+	#
+	if param compare -s SYS_USE_IO 1
 	then
-	# Check if PX4IO present and update firmware if needed.
+		# Check if PX4IO present and update firmware if needed.
 		if [ -f $IOFW ]
 		then
 			if ! px4io checkcrc ${IOFW}
@@ -298,12 +293,12 @@ else
 					tune_control stop
 				fi
 			fi
+		fi
 
-			if ! px4io start
-			then
-				echo "PX4IO start failed"
-				set STARTUP_TUNE 2 # tune 2 = ERROR_TUNE
-			fi
+		if ! px4io start
+		then
+			echo "PX4IO start failed"
+			set STARTUP_TUNE 2 # tune 2 = ERROR_TUNE
 		fi
 	fi
 
@@ -392,23 +387,6 @@ else
 	fi
 
 	#
-	# state estimator selection
-	if param compare -s EKF2_EN 1
-	then
-		ekf2 start &
-	fi
-
-	if param compare -s LPE_EN 1
-	then
-		local_position_estimator start
-	fi
-
-	if param compare -s ATT_EN 1
-	then
-		attitude_estimator_q start
-	fi
-
-	#
 	# Configure vehicle type specific parameters.
 	# Note: rc.vehicle_setup is the entry point for all vehicle type specific setup.
 	. ${R}etc/init.d/rc.vehicle_setup
@@ -439,14 +417,6 @@ else
 	# Must be started after the serial config is read
 	rc_input start $RC_INPUT_ARGS
 
-	# Manages USB interface
-	if ! cdcacm_autostart start
-	then
-		sercon
-		echo "Starting MAVLink on /dev/ttyACM0"
-		mavlink start -d /dev/ttyACM0
-	fi
-
 	#
 	# Play the startup tune (if not disabled or there is an error)
 	#
@@ -464,12 +434,7 @@ else
 	#
 	# Start a thermal calibration if required.
 	#
-	set RC_THERMAL_CAL ${R}etc/init.d/rc.thermal_cal
-	if [ -f ${RC_THERMAL_CAL} ]
-	then
-		. ${RC_THERMAL_CAL}
-	fi
-	unset RC_THERMAL_CAL
+	. ${R}etc/init.d/rc.thermal_cal
 
 	#
 	# Start gimbal to control mounts such as gimbals, disabled by default.
@@ -530,12 +495,7 @@ else
 	#
 	# Start the logger.
 	#
-	set RC_LOGGING ${R}etc/init.d/rc.logging
-	if [ -f ${RC_LOGGING} ]
-	then
-		. ${RC_LOGGING}
-	fi
-	unset RC_LOGGING
+	. ${R}etc/init.d/rc.logging
 
 	#
 	# Set additional parameters and env variables for selected AUTOSTART.
@@ -568,10 +528,6 @@ else
 		then
 			cyphal start
 		fi
-	fi
-	if param greater -s ZENOH_ENABLE 0
-	then
-		zenoh start
 	fi
 
 #
