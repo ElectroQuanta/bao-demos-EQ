@@ -79,9 +79,10 @@ export BAO_DEMOS_WRKDIR_PLAT=$(wrkdir_plat_imgs)
 
 all: platform 
 
-bao_repo:=https://github.com/bao-project/bao-hypervisor
-#bao_repo:=https://github.com/ElectroQuanta/bao-hypervisor-porting
-bao_version:=v1.0.0
+#bao_repo:=https://github.com/bao-project/bao-hypervisor
+#bao_version:=v1.0.0
+bao_repo:=git@github.com:ElectroQuanta/bao-hypervisor-porting.git
+bao_version:=rpi4/uart5
 bao_src:=$(wrkdir_src)/bao
 bao_cfg_repo:=$(wrkdir_demo_imgs)/config
 wrkdirs+=$(bao_cfg_repo)
@@ -149,7 +150,8 @@ bao_distclean: bao_clean_cfg
 bao_clean_cfg:
 	-@rm -vrf $(bao_cfg_repo)
 
-guests_clean bao_clean:
+baremetal_clean:
+	-@rm -v $(wrkdir_imgs)/$(PLATFORM)/baremetal/baremetal.bin
 
 clean: guests_clean bao_clean platform_clean
 	-@rm -rf $(wrkdir)/imgs/$(PLATFORM)/$(DEMO)

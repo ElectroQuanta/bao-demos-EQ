@@ -1,6 +1,8 @@
 baremetal_src:=$(wrkdir_src)/baremetal
-baremetal_repo:=https://github.com/bao-project/bao-baremetal-guest.git 
-baremetal_branch:=demo
+#baremetal_repo:=https://github.com/bao-project/bao-baremetal-guest.git 
+#baremetal_branch:=demo
+baremetal_repo:=git@github.com:ElectroQuanta/bao-baremetal-guest-porting.git 
+baremetal_branch:=master
 
 $(baremetal_src):
 	git clone $(baremetal_repo) $@ --branch $(baremetal_branch)
