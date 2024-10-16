@@ -10,11 +10,11 @@ dtoverlay=uart5
 enable_uart=1
 # uart_2ndstage=1 # only works with UART0 or UART1
 
-# JTAG config
-# Disable pull downs
-gpio=22-27=np
-# Enable jtag pins (i.e. GPIO22-GPIO27)
-enable_jtag_gpio=1
+# # JTAG config
+# # Disable pull downs
+# gpio=22-27=np
+# # Enable jtag pins (i.e. GPIO22-GPIO27)
+# enable_jtag_gpio=1
 
 ## Enable SPI and I2C
 # dtoverlay=sc16is752-spi1

@@ -102,7 +102,7 @@ $(bao_src):
 	git clone --branch $(bao_version) $(bao_repo) $(bao_src)
 	git -C $(bao_src) submodule init
 	git -C $(bao_src) submodule update --recursive
-	sed -i '20i\void uart_putc(volatile bao_uart_t *, const char );' $(bao_src)/src/core/console.c
+#sed -i '20i\void uart_putc(volatile bao_uart_t *, const char );' $(bao_src)/src/core/console.c
 
 $(bao_cfg): | $(bao_cfg_repo)
 	cp -vL $(bao_demos)/demos/$(DEMO)/configs/$(PLATFORM).c $(bao_cfg)
