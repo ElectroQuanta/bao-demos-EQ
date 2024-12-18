@@ -1,0 +1,28 @@
+config BR2_PACKAGE_LIBCAMERA_RPI
+	bool "libcamera-rpi"
+	depends on BR2_INSTALL_LIBSTDCPP # libcamera/boost
+	depends on BR2_TOOLCHAIN_HAS_THREADS # libcamera/boost
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8 # libcamera
+	depends on !BR2_STATIC_LIBS # gnutls/libcamera
+	depends on BR2_USE_WCHAR # gnutls/libcamera/boost
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_GNUTLS
+	select BR2_PACKAGE_OPENSSL
+	select BR2_PACKAGE_TIFF
+	select BR2_PACKAGE_PYTHON3
+	select BR2_PACKAGE_PYTHON_PYYAML
+	select BR2_PACKAGE_HOST_PYTHON_PYYAML
+	select BR2_PACKAGE_PYTHON_PYBIND
+	select BR2_PACKAGE_PYTHON_JINJA2
+	select BR2_PACKAGE_LIBGLIB2
+	select BR2_PACKAGE_YAML
+	select BR2_PACKAGE_GSTREAMER1
+	help
+	  libcamera is a complex camera support library for Linux,
+	  Android, and ChromeOS.
+
+	  https://github.com/raspberrypi/libcamera
+
+comment "libcamera needs a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 8"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS || \
+		!BR2_TOOLCHAIN_GCC_AT_LEAST_8 || BR2_STATIC_LIBS || !BR2_USE_WCHAR

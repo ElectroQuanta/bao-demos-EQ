@@ -1,0 +1,12 @@
+diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
+index 95fb5f1c9..c6bd5f572 100644
+--- a/drivers/spi/spidev.c
++++ b/drivers/spi/spidev.c
+@@ -710,6 +710,7 @@ static const struct spi_device_id spidev_spi_ids[] = {
+ 	{ .name = "spi-authenta" },
+ 	{ .name = "em3581" },
+ 	{ .name = "si3210" },
++	{ .name = "spidev" },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(spi, spidev_spi_ids);

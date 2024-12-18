@@ -260,15 +260,21 @@ copy_files() {
 	print_info ">> Bootloader and firmware"
 
 	# Copy firmware
-	sudo cp -vrf "$BAO_DEMOS_WRKDIR_PLAT"/firmware/boot/* "$BAO_DEMOS_SDCARD"
+	print_info ">> Overlays and dtbs..."
+	sudo cp -rf "$BAO_DEMOS_WRKDIR_PLAT"/firmware/boot/* "$BAO_DEMOS_SDCARD"
 	# Copy configuration txt
+	print_info ">> Config.txt and comdline.txt..."
 	sudo cp -v "$BAO_DEMOS/platforms/rpi4/config.txt" "$BAO_DEMOS_SDCARD"
 	sudo cp -v "$BAO_DEMOS/platforms/rpi4/cmdline.txt" "$BAO_DEMOS_SDCARD"
 	# Copy $DEMO binaries (linux.bin, freertos.bin, bao.bin)
-	sudo cp -vr "$BAO_DEMOS_WRKDIR_PLAT/$DEMO"/* "$BAO_DEMOS_SDCARD"
+	print_info ">> ${DEMO} binaries..."
+	#sudo cp -v "$BAO_DEMOS_WRKDIR_PLAT/$DEMO"/bao.bin "$BAO_DEMOS_SDCARD"
+	sudo cp -vr "$BAO_DEMOS_WRKDIR_PLAT/$DEMO"/*.bin "$BAO_DEMOS_SDCARD"
+	#sudo cp -vr "$BAO_DEMOS_WRKDIR_PLAT/$DEMO"/*.elf "$BAO_DEMOS_SDCARD"
 #	sudo cp -vr "$BAO_DEMOS_WRKDIR_PLAT/broadcom" "$BAO_DEMOS_SDCARD"
 	# Copy Bootloader binaries(bl31.bin, u-boot.bin)
-	sudo cp -v "$BAO_DEMOS_WRKDIR_PLAT"/* "$BAO_DEMOS_SDCARD"
+	print_info ">> Bootloader binaries..."
+	sudo cp -v "$BAO_DEMOS_WRKDIR_PLAT"/*.bin "$BAO_DEMOS_SDCARD"
 	# sudo cp -v $BAO_DEMOS_WRKDIR_PLAT/u-boot.bin $BAO_DEMOS_SDCARD
 	# sudo cp -v $BAO_DEMOS_WRKDIR_IMGS/bao.bin $BAO_DEMOS_SDCARD
 

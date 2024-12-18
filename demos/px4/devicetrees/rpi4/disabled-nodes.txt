@@ -1,0 +1,429 @@
+
+		xhci@7e9c0000 {
+			power-domains = <0x10 0x06>;
+			interrupts = <0x00 0xb0 0x04>;
+			compatible = "generic-xhci";
+			status = "disabled";
+			reg = <0x00 0x7e9c0000 0x00 0x100000>;
+			phandle = <0xe8>;
+		};
+
+
+		spi@7e204600 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x1c 0x1d>;
+			interrupts = <0x00 0x76 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2835-spi";
+			status = "disabled";
+			reg = <0x7e204600 0x200>;
+			phandle = <0xca>;
+		};
+
+
+		vec@7ec13000 {
+			power-domains = <0x10 0x07>;
+			interrupts = <0x00 0x7b 0x04>;
+			clocks = <0x14 0x0f>;
+			compatible = "brcm,bcm2711-vec";
+			status = "disabled";
+			reg = <0x7ec13000 0x1000>;
+			phandle = <0xd8>;
+		};
+
+
+		pwm@7e20c800 {
+			pinctrl-names = "default";
+			pinctrl-0 = <0x28 0x29>;
+			assigned-clocks = <0x08 0x1e>;
+			assigned-clock-rates = <0x2faf080>;
+			clocks = <0x08 0x1e>;
+			#pwm-cells = <0x03>;
+			compatible = "brcm,bcm2835-pwm";
+			status = "disabled";
+			reg = <0x7e20c800 0x28>;
+			phandle = <0xd5>;
+		};
+
+
+		i2c@7e205a00 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x26>;
+			interrupts = <0x00 0x75 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2711-i2c\0brcm,bcm2835-i2c";
+			status = "disabled";
+			reg = <0x7e205a00 0x200>;
+			phandle = <0xd0>;
+		};
+
+
+		i2c@7e205800 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x25>;
+			interrupts = <0x00 0x75 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2711-i2c\0brcm,bcm2835-i2c";
+			status = "disabled";
+			reg = <0x7e205800 0x200>;
+			phandle = <0xcf>;
+		};
+
+
+		mmc@7e202000 {
+			bus-width = <0x04>;
+			interrupts = <0x00 0x78 0x04>;
+			clocks = <0x08 0x14>;
+			brcm,pio-limit = <0x01>;
+			dma-names = "rx-tx";
+			compatible = "brcm,bcm2835-sdhost";
+			status = "disabled";
+			firmware = <0x06>;
+			reg = <0x7e202000 0x100>;
+			phandle = <0x4b>;
+			dmas = <0x0c 0x2000000d>;
+			brcm,overclock-50 = <0x00>;
+		};
+
+
+		serial@7e201800 {
+			arm,primecell-periphid = <0x241011>;
+			pinctrl-names = "default";
+			pinctrl-0 = <0x1a>;
+			clock-names = "uartclk\0apb_pclk";
+			interrupts = <0x00 0x79 0x04>;
+			clocks = <0x08 0x13 0x08 0x14>;
+			compatible = "arm,pl011\0arm,primecell";
+			status = "disabled";
+			reg = <0x7e201800 0x200>;
+			phandle = <0xc8>;
+		};
+
+
+		spi@7e204a00 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x20 0x21>;
+			interrupts = <0x00 0x76 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2835-spi";
+			status = "disabled";
+			reg = <0x7e204a00 0x200>;
+			phandle = <0xcc>;
+		};
+
+
+		spi@7e204800 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x1e 0x1f>;
+			interrupts = <0x00 0x76 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2835-spi";
+			status = "disabled";
+			reg = <0x7e204800 0x200>;
+			phandle = <0xcb>;
+		};
+
+
+		csi@7e800000 {
+			power-domains = <0x10 0x0c>;
+			#address-cells = <0x01>;
+			clock-names = "lp\0vpu";
+			interrupts = <0x00 0x66 0x04>;
+			clocks = <0x08 0x2d 0x14 0x04>;
+			#size-cells = <0x00>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2835-unicam";
+			status = "disabled";
+			reg = <0x7e800000 0x800 0x7e802000 0x04>;
+			phandle = <0x51>;
+		};
+
+
+		pwm@7e20c000 {
+			assigned-clocks = <0x08 0x1e>;
+			assigned-clock-rates = <0x2faf080>;
+			clocks = <0x08 0x1e>;
+			#pwm-cells = <0x03>;
+			compatible = "brcm,bcm2835-pwm";
+			status = "disabled";
+			reg = <0x7e20c000 0x28>;
+			phandle = <0xc1>;
+		};
+
+
+		fb {
+			compatible = "brcm,bcm2708-fb";
+			status = "disabled";
+			firmware = <0x06>;
+			phandle = <0xdf>;
+		};
+
+
+		serial@7e201400 {
+			arm,primecell-periphid = <0x241011>;
+			pinctrl-names = "default";
+			pinctrl-0 = <0x18>;
+			clock-names = "uartclk\0apb_pclk";
+			interrupts = <0x00 0x79 0x04>;
+			clocks = <0x08 0x13 0x08 0x14>;
+			compatible = "arm,pl011\0arm,primecell";
+			status = "disabled";
+			reg = <0x7e201400 0x200>;
+			phandle = <0xc6>;
+		};
+
+
+			bluetooth {
+				local-bd-address = [00 00 00 00 00 00];
+				fallback-bd-address;
+				shutdown-gpios = <0x0b 0x00 0x00>;
+				max-speed = <0x38400>;
+				compatible = "brcm,bcm43438-bt";
+				status = "disabled";
+				phandle = <0x42>;
+			};
+
+
+		i2c@7e205c00 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x27>;
+			interrupts = <0x00 0x75 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2711-i2c\0brcm,bcm2835-i2c";
+			status = "disabled";
+			reg = <0x7e205c00 0x200>;
+			phandle = <0xd1>;
+		};
+
+
+		smi@7e600000 {
+			assigned-clocks = <0x08 0x2a>;
+			assigned-clock-rates = <0x7735940>;
+			interrupts = <0x00 0x70 0x04>;
+			clocks = <0x08 0x2a>;
+			dma-names = "rx-tx";
+			compatible = "brcm,bcm2835-smi";
+			status = "disabled";
+			reg = <0x7e600000 0x100>;
+			phandle = <0xda>;
+			dmas = <0x0c 0x04>;
+		};
+
+
+		spi@7e2150c0 {
+			#address-cells = <0x01>;
+			interrupts = <0x00 0x5d 0x04>;
+			clocks = <0x11 0x02>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2835-aux-spi";
+			status = "disabled";
+			reg = <0x7e2150c0 0x40>;
+			phandle = <0xc0>;
+		};
+
+
+		usb@7e980000 {
+			power-domains = <0x10 0x06>;
+			#address-cells = <0x01>;
+			phy-names = "usb2-phy";
+			clock-names = "otg";
+			interrupts = <0x00 0x49 0x04 0x00 0x28 0x04>;
+			clocks = <0x16>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2708-usb";
+			status = "disabled";
+			interrupt-names = "usb\0soft";
+			phys = <0x17>;
+			reg = <0x7e980000 0x10000 0x7e00b200 0x200>;
+			phandle = <0xc3>;
+		};
+
+
+		sound {
+			status = "disabled";
+			phandle = <0xe0>;
+		};
+
+
+		dsi@7e209000 {
+			power-domains = <0x10 0x11>;
+			#address-cells = <0x01>;
+			clock-output-names = "dsi0_byte\0dsi0_ddr2\0dsi0_ddr";
+			clock-names = "phy\0escape\0pixel";
+			interrupts = <0x00 0x64 0x04>;
+			clocks = <0x08 0x22 0x08 0x2f 0x08 0x31>;
+			#size-cells = <0x00>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2835-dsi0";
+			status = "disabled";
+			reg = <0x7e209000 0x78>;
+			phandle = <0x04>;
+		};
+
+
+		i2s@7e203000 {
+			pinctrl-names = "default";
+			pinctrl-0 = <0x0d>;
+			clocks = <0x08 0x1f>;
+			dma-names = "tx\0rx";
+			#sound-dai-cells = <0x00>;
+			compatible = "brcm,bcm2835-i2s";
+			status = "disabled";
+			reg = <0x7e203000 0x24>;
+			phandle = <0x45>;
+			dmas = <0x0c 0x02 0x0c 0x03>;
+		};
+
+
+		spi@7e204c00 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x22 0x23>;
+			interrupts = <0x00 0x76 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2835-spi";
+			status = "disabled";
+			reg = <0x7e204c00 0x200>;
+			phandle = <0xcd>;
+		};
+
+
+			bluetooth {
+				local-bd-address = [1c fe c5 dd 3a d8];
+				fallback-bd-address;
+				shutdown-gpios = <0x0b 0x00 0x00>;
+				max-speed = <0x2dc6c0>;
+				compatible = "brcm,bcm43438-bt";
+				status = "disabled";
+				phandle = <0x41>;
+			};
+
+
+		mmc@7e300000 {
+			pinctrl-names = "default";
+			pinctrl-0 = <0x13>;
+			bus-width = <0x04>;
+			interrupts = <0x00 0x7e 0x04>;
+			clocks = <0x08 0x1c>;
+			dma-names = "rx-tx";
+			compatible = "brcm,bcm2835-mmc\0brcm,bcm2835-sdhci";
+			status = "disabled";
+			reg = <0x7e300000 0x100>;
+			phandle = <0x4c>;
+			dmas = <0x0c 0x0b>;
+			brcm,overclock-50 = <0x00>;
+		};
+
+
+		i2c@7e205600 {
+			pinctrl-names = "default";
+			#address-cells = <0x01>;
+			pinctrl-0 = <0x24>;
+			interrupts = <0x00 0x75 0x04>;
+			clocks = <0x08 0x14>;
+			#size-cells = <0x00>;
+			compatible = "brcm,bcm2711-i2c\0brcm,bcm2835-i2c";
+			status = "disabled";
+			reg = <0x7e205600 0x200>;
+			phandle = <0xce>;
+		};
+
+
+		dpi@7e208000 {
+			clock-names = "core\0pixel";
+			clocks = <0x08 0x14 0x08 0x2c>;
+			compatible = "brcm,bcm2835-dpi";
+			status = "disabled";
+			reg = <0x7e208000 0x8c>;
+			phandle = <0xbe>;
+		};
+
+
+		axiperf {
+			compatible = "brcm,bcm2711-axiperf";
+			status = "disabled";
+			firmware = <0x06>;
+			reg = <0x7e009800 0x100 0x7ee08000 0x100>;
+			phandle = <0x4e>;
+		};
+
+
+		timer@7e003000 {
+			interrupts = <0x00 0x40 0x04 0x00 0x41 0x04 0x00 0x42 0x04 0x00 0x43 0x04>;
+			clock-frequency = <0xf4240>;
+			compatible = "brcm,bcm2835-system-timer";
+			status = "disabled";
+			reg = <0x7e003000 0x1000>;
+			phandle = <0x62>;
+		};
+
+
+		serial@7e201600 {
+			arm,primecell-periphid = <0x241011>;
+			pinctrl-names = "default";
+			pinctrl-0 = <0x19>;
+			clock-names = "uartclk\0apb_pclk";
+			interrupts = <0x00 0x79 0x04>;
+			clocks = <0x08 0x13 0x08 0x14>;
+			compatible = "arm,pl011\0arm,primecell";
+			status = "disabled";
+			reg = <0x7e201600 0x200>;
+			phandle = <0xc7>;
+		};
+
+
+		firmwarekms@7e600000 {
+			brcm,firmware = <0x06>;
+			interrupts = <0x00 0x70 0x04>;
+			compatible = "raspberrypi,rpi-firmware-kms-2711";
+			status = "disabled";
+			reg = <0x7e600000 0x100>;
+			phandle = <0xd9>;
+		};
+
+
+		dsi@7e700000 {
+			power-domains = <0x10 0x12>;
+			#address-cells = <0x01>;
+			clock-output-names = "dsi1_byte\0dsi1_ddr2\0dsi1_ddr";
+			clock-names = "phy\0escape\0pixel";
+			interrupts = <0x00 0x6c 0x04>;
+			clocks = <0x08 0x23 0x08 0x30 0x08 0x32>;
+			#size-cells = <0x00>;
+			#clock-cells = <0x01>;
+			compatible = "brcm,bcm2711-dsi1";
+			status = "disabled";
+			reg = <0x7e700000 0x8c>;
+			phandle = <0x05>;
+		};
+
+
+	cam0_regulator {
+		enable-active-high;
+		regulator-name = "cam0-reg";
+		compatible = "regulator-fixed";
+		status = "disabled";
+		phandle = <0xeb>;
+	};
+
+
+	cam0_clk {
+		#clock-cells = <0x00>;
+		compatible = "fixed-clock";
+		status = "disabled";
+		phandle = <0xec>;
+	};
+

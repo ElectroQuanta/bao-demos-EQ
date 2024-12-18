@@ -1,0 +1,23 @@
+config BR2_PACKAGE_RPICAM_APPS
+	bool "rpicam-apps"
+	depends on BR2_INSTALL_LIBSTDCPP # libcamera/boost
+	depends on BR2_TOOLCHAIN_HAS_THREADS # libcamera/boost
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8 # libcamera
+	depends on !BR2_STATIC_LIBS # gnutls/libcamera
+	depends on BR2_USE_WCHAR # gnutls/libcamera/boost
+	#cmake libboost-program-options-dev libdrm-dev libexif-dev
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_LIBEXIF
+	select BR2_PACKAGE_LIBPNG
+	select BR2_PACKAGE_LIBCAMERA_RPI
+	help
+	  Camera applications for the Raspberry Pi with support for
+	  CSI cameras
+
+	  https://github.com/raspberrypi/rpicam-apps
+
+comment "rpicam-apps needs a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 8"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS || \
+		!BR2_TOOLCHAIN_GCC_AT_LEAST_8 || BR2_STATIC_LIBS || !BR2_USE_WCHAR

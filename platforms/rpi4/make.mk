@@ -1,3 +1,6 @@
+# Include common function
+include $(bao_demos)/common.mk
+
 ARCH:=aarch64
 
 ####################### Firmware
@@ -5,11 +8,12 @@ firmware_repo:=https://github.com/raspberrypi/firmware.git
 #firmware_version:=1.20240306
 #firmware_version:=1.20240424
 #firmware_version:=1.20240529
-firmware_version:=1.20240902
+firmware_version:=1.20241008
 #firmware_version:=1.20230405
 firmware_images:=$(wrkdir_plat_imgs)/firmware
 
 $(firmware_images):
+	@$(call print_msg,>> Firmware: Downloading...)
 	git clone --depth 1 --branch $(firmware_version) $(firmware_repo) $@
 	git submodule update --init --recursive
 	git submodule update --remote --recursive
@@ -34,6 +38,6 @@ platform: $(bao_image) $(uboot_image) $(atf_image) $(firmware_images)
 #	$(call print-instructions, $(instructions), 3, true)
 
 deploySD: platform
-	@echo "Wrkdir: $(BAO_DEMOS_WRKDIR)"
+	@$(call print_msg,>> Deploying to SD card...)
 	. $(platform_dir)/deploy.sh
 #. $(platform_dir)/deploy.sh && sdcard_deploy

@@ -1,4 +1,5 @@
 wrkdir/
+.cache/
 *~undo-tree~
 env.txt
 
@@ -8,3 +9,13 @@ SDCard
 build.log
 bao-venv/
 compile_commands.json
+.tar.gx
+__pycache__/
+
+# Backup images
+guests/px4/imgs/
+guests/px4/linux/buildroot/imgs/
+guests/px4/linux-cam/buildroot/rootfs_overlays/var/
+guests/px4/linux-cam/buildroot/rootfs_overlays_backup/
+platforms/rpi4/gdb/no-dbg
+platforms/rpi4/gdb/dbg-point

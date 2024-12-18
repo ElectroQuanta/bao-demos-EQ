@@ -1,3 +1,6 @@
+# Include common function
+include $(bao_demos)/common.mk
+
 uboot_repo:=https://github.com/u-boot/u-boot.git
 uboot_version:=v2024.07
 uboot_src:=$(wrkdir_src)/u-boot
@@ -10,13 +13,15 @@ uboot_cfg:=$(uboot_src)/.config
 dtb_dir:=$(wrkdir_plat_imgs)/broadcom
 
 $(uboot_src):
+	@$(call print_msg,>> U-BOOT: Downloading...)
 	git clone --depth 1 --branch $(uboot_version) $(uboot_repo) $(uboot_src)
 
 define build-uboot
 $(strip $1): $(uboot_src)
+	@$(call print_msg,>> U-BOOT: Configuring...)
 	$(MAKE) -C $(uboot_src) $(strip $2)
 #	@echo $(strip $3) >> $(uboot_src)/.config
-	@echo "Modifying U-Boot environment"
+	@$(call print_msg,>> U-BOOT: Modifying environment...)
 # Uboot config
 #	@printf "CONFIG_OF_SEPARATE=n\n" >> $(uboot_cfg)
 #	@printf "CONFIG_OF_EMBED=y\n" >> $(uboot_cfg)
@@ -35,8 +40,10 @@ $(strip $1): $(uboot_src)
 	@printf "\n\nbootcmd_fatload=fatload mmc 0 $(uboot_load_bin_addr) $(uboot_load_bin); go $(uboot_load_bin_addr)\n" >> $(env_file)
 	@printf "bootcmd=run bootcmd_fatload\n" >> $(env_file)
 # Make
+	@$(call print_msg,>> U-BOOT: Building...)
 	$(MAKE) -C $(uboot_src) -j$(nproc)
 # Copy
+	@$(call print_msg,>> U-BOOT: Copying u-boot.bin...)
 	cp $(uboot_src)/u-boot.bin $$@
 #	mkdir -p $(dtb_dir)
 #	cp -v $(uboot_src)/dts/dt.dtb $(dtb_dir)/bcm2711-rpi-4-b.dtb

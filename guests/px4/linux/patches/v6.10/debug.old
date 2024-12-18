@@ -1,0 +1,21 @@
+diff --git a/init/main.c b/init/main.c
+index 206acdde5..bff900bdc 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -905,6 +905,16 @@ void start_kernel(void)
+ 	char *command_line;
+ 	char *after_dashes;
+ 
++// DEBUG point
++#ifndef GDB_DEBUG
++#define GDB_DEBUG 1
++#endif
++#if GDB_DEBUG == 1
++  volatile int a = 1;
++  while (a == 1)
++    ;
++#endif
++
+ 	set_task_stack_end_magic(&init_task);
+ 	smp_setup_processor_id();
+ 	debug_objects_early_init();

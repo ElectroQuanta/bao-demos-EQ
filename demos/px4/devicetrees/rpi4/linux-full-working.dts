@@ -300,7 +300,7 @@ cam_dummy_reg:	cam_dummy_reg {
 		};
 
 	clk_usb:	clk-usb {
-			clock-output-names = "otg";
+			clock-output-names = "otg"	;
 			#clock-cells = <0x00>;
 			clock-frequency = <0x1c9c3800>;
 			compatible = "fixed-clock";

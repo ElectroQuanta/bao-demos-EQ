@@ -1,0 +1,2 @@
+[binaries]
+python3 = '/home/zmp/Documents/br-main/buildroot-2024.02.3/output/host/bin/python3.11'

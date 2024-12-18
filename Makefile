@@ -6,6 +6,9 @@ bao_demos:=$(abspath .)
 platform_dir:=$(bao_demos)/platforms/$(PLATFORM)
 demo_dir:=$(bao_demos)/demos/$(DEMO)
 
+# Include common function
+include $(bao_demos)/common.mk
+
 ifeq ($(filter clean distclean, $(MAKECMDGOALS)),)
 ifndef CROSS_COMPILE
  $(error No CROSS_COMPILE prefix defined)
@@ -108,7 +111,8 @@ $(bao_cfg): | $(bao_cfg_repo)
 	cp -vL $(bao_demos)/demos/$(DEMO)/configs/$(PLATFORM).c $(bao_cfg)
 
 bao $(bao_image): $(guest_images) $(bao_cfg) $(bao_src) 
-	$(MAKE) -C $(bao_src)\
+	@$(call print_msg,BAO: Building from config $(bao_cfg_repo)/$(DEMO))
+	bear -- $(MAKE) -C $(bao_src)\
 		PLATFORM=$(PLATFORM)\
 		CONFIG_REPO=$(bao_cfg_repo)\
 		CONFIG=$(DEMO) \
@@ -156,8 +160,19 @@ baremetal_clean:
 clean: guests_clean bao_clean platform_clean
 	-@rm -rf $(wrkdir)/imgs/$(PLATFORM)/$(DEMO)
 
-distclean:
-	rm -rf $(wrkdir)
+distclean: clean-br-imgs
+	@$(call print_msg,Cleaning working directory...)
+	@if $(call confirm_action,Are you sure you want to remove WRKDIR; then \
+		$(call print_msg,Proceeding with removal...); \
+		-@rm -rf $(wrkdir)
+	else \
+		$(call print_msg,Aborted by the user.); \
+	fi
 
-.PHONY: all clean guests bao platform
+# .PHONY: all clean guests bao platform
+.PHONY: firmware_clean atf_clean atf_distclean uboot_clean \
+        uboot_distclean platform_clean bao_distclean bao_clean_cfg \
+        baremetal_clean clean distclean clean-dtb clean-linux-bin \
+        clean-br-px4-img clean-br-cam-img clean-br-imgs \
+	    bao guests platform all
 .NOTPARALLEL:

@@ -42,3 +42,6 @@ dtmerge -d "${merged_dtb}" "${merged_dtb}" "${ov_disable_bt}"
 # Enable UART 5
 printf "\n>> Enabling UART 5\n"
 dtmerge -d "${merged_dtb}" "${merged_dtb}" "${ov_uart5}"
+
+# Decompile to dts
+dtc -@ "${merged_dtb}" > linux.dts
