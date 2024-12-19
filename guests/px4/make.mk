@@ -43,6 +43,7 @@ endif
 	@$(call print_msg,>> BUILDROOT: reconfigure Linux kernel and build)
 	$(MAKE) -C $(buildroot_src) linux-reconfigure all
 	@$(call print_msg,>> BUILDROOT: copying image for backup...)
+	@mkdir -p $(br_imgs_dir)
 	cp $(buildroot_src)/output/images/Image "$(buildroot_img)-$(strip $1)"
 endef
 

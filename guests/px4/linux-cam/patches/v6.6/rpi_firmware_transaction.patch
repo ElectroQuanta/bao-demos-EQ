@@ -1,0 +1,46 @@
+--- raspberrypi.c	2024-12-19 01:18:34.601183189 +0000
++++ rpi_patch.c	2024-12-19 01:18:10.087700835 +0000
+@@ -17,6 +17,9 @@
+ #include <linux/reboot.h>
+ #include <linux/slab.h>
+ #include <soc/bcm2835/raspberrypi-firmware.h>
++/**< Bao Hypercall includes */
++#include <linux/arm-smccc.h>
++#include <asm/memory.h>
+ 
+ #define MBOX_MSG(chan, data28)		(((data28) & ~0xf) | ((chan) & 0xf))
+ #define MBOX_CHAN(msg)			((msg) & 0xf)
+@@ -59,6 +62,16 @@
+ 	WARN_ON(data & 0xf);
+ 
+ 	mutex_lock(&transaction_lock);
++	/** HYP call to Bao to:
++	 * lock access to mailbox
++	 * get mailbox irqs
++	 */
++    register u64 x0 asm("x0") =
++        ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64, ARM_SMCCC_OWNER_VENDOR_HYP, 1);
++    register u64 x1 asm("x1") = 1; /**< RPI_HYP_ARG_START */
++    register u64 x2 asm("x2") = 0; /**< DO NOT CARE */
++    asm volatile("hvc 0\t\n" : "=r"(x0) : "r"(x0), "r"(x1), "r"(x2));
++	
+ 	reinit_completion(&fw->c);
+ 	ret = mbox_send_message(fw->chan, &message);
+ 	if (ret >= 0) {
+@@ -71,6 +84,16 @@
+ 	} else {
+ 		dev_err(fw->cl.dev, "mbox_send_message returned %d\n", ret);
+ 	}
++
++	/** HYP call to Bao to:
++	 * unlock access to mailbox
++	 * relinquish mailbox irqs
++	 */
++    register u64 x0 asm("x0") =
++        ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64, ARM_SMCCC_OWNER_VENDOR_HYP, 1);
++    register u64 x1 asm("x1") = 2; /**< RPI_HYP_ARG_END */
++    register u64 x2 asm("x2") = 0; /**< DO NOT CARE */
++    asm volatile("hvc 0\t\n" : "=r"(x0) : "r"(x0), "r"(x1), "r"(x2));
+ 	mutex_unlock(&transaction_lock);
+ 
+ 	return ret;
