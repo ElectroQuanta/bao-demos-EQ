@@ -14,6 +14,12 @@ VM_IMAGE(vm2_image, XSTR(BAO_DEMOS_WRKDIR_IMGS/linux_cam.bin)); /**< Cam */
 #define VM2_MEM1_SIZE  0x27000000ULL
 #define VM2_MEM2_BASE  0x100000000ULL
 #define VM2_MEM2_SIZE  0x80000000ULL
+/* #define VM2_MEM2_BASE  0x40000000ULL */
+/* #define VM2_MEM2_SIZE  0x40000000ULL */
+/* #define VM2_MEM2_BASE  0x40000000ULL */
+/* #define VM2_MEM2_SIZE  0xbc000000ULL */
+#define VM2_PCIE_MEM_BASE 0x600000000ULL
+#define VM2_PCIE_MEM_SIZE 0x40000000ULL
 
 struct config config = {
 
@@ -35,11 +41,13 @@ struct config config = {
                              (struct vm_mem_region[]){{.base = VM1_MEM1_BASE,
                                                        .size = VM1_MEM1_SIZE,
                                                        .place_phys = true,
-                                                       .phys = VM1_MEM1_BASE},
+                                                       .phys =
+           VM1_MEM1_BASE},
                                                       {.base = VM1_MEM2_BASE,
                                                        .size = VM1_MEM2_SIZE,
                                                        .place_phys = true,
-                                                       .phys = VM1_MEM2_BASE}},
+                                                       .phys =
+           VM1_MEM2_BASE}},
 
                          /* .ipc_num = 1, */
                          /*  .ipcs = (struct ipc[]) { */
@@ -72,13 +80,15 @@ struct config config = {
                                  },
 
                                  /**< Mailbox (required for firmware) */
-                                 {//.pa = 0xfe00b880,
-                                  //.va = 0xfe00b880,
-                                  .pa = 0xfe00b000,
-                                  .va = 0xfe00b000,
-                                  .size = 0x1000,
-                                  .interrupt_num = 1,
-                                  .interrupts = (irqid_t[]){65}},
+                                 {
+                                     //.pa = 0xfe00b880,
+                                     //.va = 0xfe00b880,
+                                     .pa = 0xfe00b000,
+                                     .va = 0xfe00b000,
+                                     .size = 0x1000,
+                                     /* .interrupt_num = 1, */
+                                     /* .interrupts = (irqid_t[]){65} */
+                                 },
 
                                  /**< GPIO controller */
                                  {.pa = 0xfe200000,
@@ -108,7 +118,8 @@ struct config config = {
                                   .size = 0x1000,
                                   .interrupt_num = 9,
                                   .interrupts = (irqid_t[]){112,
-                                                            113, 114, 115, 116, 117, 118, 119, 120}},
+                                                            113, 114, 115,
+           116, 117, 118, 119, 120}},
                                  /**< i2c_arm (i2c1) */
                                  {.pa = 0xfe804000,
                                   .va = 0xfe804000,
@@ -129,18 +140,23 @@ struct config config = {
 
          .platform = {.cpu_num = 3,
 
-                      .region_num = 2,
-                      .regions =
-                          (struct vm_mem_region[]){{.base = VM2_MEM1_BASE,
-                                                    .size = VM2_MEM1_SIZE,
-                                                    .place_phys = true,
-                                                    .phys = VM2_MEM1_BASE},
-                                                   {.base = VM2_MEM2_BASE,
-                                                    .size = VM2_MEM2_SIZE,
-                                                    .place_phys = true,
-                                                    .phys = VM2_MEM2_BASE}},
+                      .region_num = 3,
+                      .regions = (struct vm_mem_region[]){
+                          {.base = VM2_MEM1_BASE,
+                           .size = VM2_MEM1_SIZE,
+                           .place_phys = true,
+                           .phys = VM2_MEM1_BASE},
+                          {.base = VM2_MEM2_BASE,
+                           .size = VM2_MEM2_SIZE,
+                           .place_phys = true,
+                           .phys = VM2_MEM2_BASE},
+                          {.base = VM2_PCIE_MEM_BASE,
+                           .size = VM2_PCIE_MEM_SIZE,
+                           .place_phys = true,
+                           .phys = VM2_PCIE_MEM_BASE}
+                          },
 
-                      .dev_num = 2,
+                      .dev_num = 5,
                       .devs = (struct vm_dev_region[]){
                           /**< Arch timer interrupt */
                           {.interrupt_num = 1, .interrupts = (irqid_t[]){27}},
@@ -154,6 +170,43 @@ struct config config = {
                               /* .interrupt_num = 1, */
                               /* .interrupts = (irqid_t[]){65} */
                           },
+                          /**< PCIE (required for USB devices) */
+                          {.pa = 0xfd500000,
+                           .va = 0xfd500000,
+                           .size = 0x10000,
+                           .interrupt_num = 2,
+                           .interrupts = (irqid_t[]){179, 180}},
+
+                          /**< Ethernet controller */
+                          {/* GENET */
+                           .pa = 0xfd580000,
+                           .va = 0xfd580000,
+                           .size = 0x10000,
+                           .interrupt_num = 2,
+                           .interrupts = (irqid_t[]){189, 190}},
+
+                          /* { */
+                          /*     .pa = 0x80cad000, */
+                          /*     .va = 0x80cad000, */
+                          /*     .size = 0x1000, */
+                          /*     /\* .interrupt_num = 1, *\/ */
+                          /*     /\* .interrupts = (irqid_t[]){65} *\/ */
+                          /* }, */
+                          /* { */
+                          /*     .pa = 0x7ffff000, */
+                          /*     .va = 0x7ffff000, */
+                          /*     .size = 0x1000, */
+                          /*     /\* .interrupt_num = 1, *\/ */
+                          /*     /\* .interrupts = (irqid_t[]){65} *\/ */
+                          /* }, */
+                          /**< PCIE Memory mapped region */
+                          {
+                              .pa = VM2_PCIE_MEM_BASE,
+                              .va = VM2_PCIE_MEM_BASE,
+                              .size = VM2_PCIE_MEM_SIZE,
+                              /* .interrupt_num = 1, */
+                              /* .interrupts = (irqid_t[]){65} */
+                          },
 		},
 
 		.arch = {
@@ -163,6 +216,6 @@ struct config config = {
 		  }
 		}
 	  },
-	}, /**< End VM1 */
+	}, /**< End VM2 */
   }, /**< End vm_list */
 }; /**< End config */

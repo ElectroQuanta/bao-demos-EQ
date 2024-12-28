@@ -69,8 +69,8 @@
 	chosen:	chosen {
 		/* stdout-path = "serial5:115200n8"; */
 		stdout-path = "";
-		bootargs = "earlycon clk_ignore_unused cfg80211.ieee80211_regdom=PT"; // disable Ethernet for PX4
-		/* bootargs = "earlycon clk_ignore_unused cfg80211.ieee80211_regdom=PT ip=192.168.42.15 carrier_timeout=0"; // disable Ethernet for PX4 */
+		/* bootargs = "earlycon clk_ignore_unused cfg80211.ieee80211_regdom=PT"; // disable Ethernet for PX4 */
+		bootargs = "earlycon clk_ignore_unused cfg80211.ieee80211_regdom=PT ip=192.168.42.15 carrier_timeout=0"; // disable Ethernet for PX4
 		/* bootargs = "earlycon console=ttyAMA5,115200 clk_ignore_unused cfg80211.ieee80211_regdom=PT ip=192.168.42.15::192.168.42.1:255.255.255.0:buildroot:eth0:off"; // disable Ethernet for PX4  */
 /* bootargs = "earlycon console=ttyAMA5,115200 clk_ignore_unused cfg80211.ieee80211_regdom=PT ip=192.168.42.15::192.168.42.1:255.255.255.0:buildroot:eth0 ip=192.168.1.60::192.168.1.1:255.255.255.0:buildroot:wlan0"; */ // DOES NOT WORK
 		/* bootargs = "earlycon console=ttyAMA5,115200 clk_ignore_unused cfg80211.ieee80211_regdom=PT swiotlb=65536"; // disable Ethernet for PX4  */
@@ -123,6 +123,7 @@
 		/* 0x00 0x17000000 0x25400000 // 580 MB */
 		/* 0x00 0x16000000 0x25400000 // 596 MB */
 		0x00 0x14400000 0x27000000 // 624 MB
+		/* 0x00 0x40000000 0xbc000000 // 3 GB */
 		0x01 0x00000000 0x80000000 // 2 GB
 		>;
 	};
@@ -1542,30 +1543,30 @@
 		/* }; */
 
 
-		/* genet:	ethernet@7d580000 { */
-		/* 	local-mac-address = [dc a6 32 a3 9c 57]; */
-		/* 	compatible = "brcm,bcm2711-genet-v5\0brcm,genet-v5"; */
-		/* 	reg = <0x00 0x7d580000 0x00 0x10000>; */
-		/* 	#address-cells = <0x01>; */
-		/* 	#size-cells = <0x01>; */
-		/* 	interrupts = <0x00 0x9d 0x04 0x00 0x9e 0x04>; */
-		/* 	status = "okay"; */
-		/* 	phy-handle = <&phy>; */
-		/* 	phy-mode = "rgmii-rxid"; */
+		genet:	ethernet@7d580000 {
+			local-mac-address = [dc a6 32 a3 9c 57];
+			compatible = "brcm,bcm2711-genet-v5\0brcm,genet-v5";
+			reg = <0x00 0x7d580000 0x00 0x10000>;
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			interrupts = <0x00 0x9d 0x04 0x00 0x9e 0x04>;
+			status = "okay";
+			phy-handle = <&phy>;
+			phy-mode = "rgmii-rxid";
 
-		/* 	genet_mdio:	mdio@e14 { */
-		/* 		compatible = "brcm,genet-mdio-v5"; */
-		/* 		reg = <0xe14 0x08>; */
-		/* 		reg-names = "mdio"; */
-		/* 		#address-cells = <0x00>; */
-		/* 		#size-cells = <0x01>; */
+			genet_mdio:	mdio@e14 {
+				compatible = "brcm,genet-mdio-v5";
+				reg = <0xe14 0x08>;
+				reg-names = "mdio";
+				#address-cells = <0x00>;
+				#size-cells = <0x01>;
 
-		/* 		phy:	ethernet-phy@1 { */
-		/* 			reg = <0x01>; */
-		/* 			led-modes = <0x00 0x08>; */
-		/* 		}; */
-		/* 	}; */
-		/* }; */
+				phy:	ethernet-phy@1 {
+					reg = <0x01>;
+					led-modes = <0x00 0x08>;
+				};
+			};
+		};
 
 
 /**< USB camera */

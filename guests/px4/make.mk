@@ -32,7 +32,13 @@ ifeq ($(strip $(linux_patches)),)
 	@$(call print_msg,>> No patches to apply)
 else
 	@$(call print_msg,>> Applying patches: $(linux_patches))
-	git -C $(linux_src) apply $(linux_patches)
+# Check if the patch applies cleanly
+	@if git -C "$(linux_src)" apply --check "$(linux_patches)"; then \
+		echo "Applying patch..."; \
+		git -C "$(linux_src)" apply "$(linux_patches)"; \
+	else \
+		echo "Patch does not apply cleanly. It might already be applied or conflict with the current code."; \
+	fi
 endif
 	@$(call print_msg,>> BUILDROOT: deep clean)
 	$(MAKE) -C $(buildroot_src) distclean

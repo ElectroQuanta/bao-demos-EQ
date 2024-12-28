@@ -20,6 +20,9 @@
 /**< Bao Hypercall includes */
 #include <linux/arm-smccc.h>
 #include <asm/memory.h>
+#define RPI_HYP_ARG_START  1
+#define RPI_HYP_ARG_END 2
+enum {HC_INVAL = 0, HC_IPC = 1, HC_RPI_FIRMWARE = 2};
 
 #define MBOX_MSG(chan, data28)		(((data28) & ~0xf) | ((chan) & 0xf))
 #define MBOX_CHAN(msg)			((msg) & 0xf)
@@ -66,10 +69,10 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
 	 * lock access to mailbox
 	 * get mailbox irqs
 	 */
-    register u64 x0 asm("x0") =
-        ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64, ARM_SMCCC_OWNER_VENDOR_HYP, 1);
-    register u64 x1 asm("x1") = 1; /**< RPI_HYP_ARG_START */
-    register u64 x2 asm("x2") = 0; /**< DO NOT CARE */
+    register uint64_t x0 asm("x0") =
+        ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64, ARM_SMCCC_OWNER_VENDOR_HYP, HC_RPI_FIRMWARE);
+    register uint64_t x1 asm("x1") = RPI_HYP_ARG_START;
+    register uint64_t x2 asm("x2") = 0; /**< DO NOT CARE */
     asm volatile("hvc 0\t\n" : "=r"(x0) : "r"(x0), "r"(x1), "r"(x2));
 	
 	reinit_completion(&fw->c);
@@ -89,10 +92,9 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
 	 * unlock access to mailbox
 	 * relinquish mailbox irqs
 	 */
-    register u64 x0 asm("x0") =
-        ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64, ARM_SMCCC_OWNER_VENDOR_HYP, 1);
-    register u64 x1 asm("x1") = 2; /**< RPI_HYP_ARG_END */
-    register u64 x2 asm("x2") = 0; /**< DO NOT CARE */
+    x0 = ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64, ARM_SMCCC_OWNER_VENDOR_HYP, HC_RPI_FIRMWARE);
+    x1 = RPI_HYP_ARG_END;
+    x2 = 0; /**< DO NOT CARE */
     asm volatile("hvc 0\t\n" : "=r"(x0) : "r"(x0), "r"(x1), "r"(x2));
 	mutex_unlock(&transaction_lock);
 

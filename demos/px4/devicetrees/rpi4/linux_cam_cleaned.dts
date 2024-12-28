@@ -1,0 +1,305 @@
+/dts-v1/;
+
+/ {
+	#address-cells = <0x02>;
+	#size-cells = <0x01>;
+	interrupt-parent = <&gicv2>;
+	model = "Raspberry Pi 4 Model B Rev 1.5";
+	serial-number = "100000000a471c8d";
+	compatible = "raspberrypi,4-model-b\0brcm,bcm2711";
+
+	zone_dma {
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		dma-ranges = <0x00 0x00 0x14400000 0x27000000>;
+	};
+
+	regulator-sd-io-1v8 {
+		compatible = "regulator-gpio";
+		regulator-name = "vdd-sd-io";
+		regulator-min-microvolt = <0x1b7740>;
+		regulator-max-microvolt = <0x325aa0>;
+		regulator-boot-on;
+		regulator-always-on;
+		regulator-settling-time-us = <0x1388>;
+		gpios = <&expgpio 0x04 0x00>;
+		states = <0x1b7740 0x01 0x325aa0 0x00>;
+		status = "okay";
+	};
+
+	regulator-sd-vcc {
+		regulator-max-microvolt = <0x325aa0>;
+		regulator-boot-on;
+		gpio = <&expgpio 0x06 0x00>;
+		enable-active-high;
+		regulator-min-microvolt = <0x325aa0>;
+		regulator-name = "vcc-sd";
+		compatible = "regulator-fixed";
+	};
+
+	fixedregulator_3v3 {
+		regulator-max-microvolt = <0x325aa0>;
+		regulator-always-on;
+		regulator-min-microvolt = <0x325aa0>;
+		regulator-name = "3v3";
+		compatible = "regulator-fixed";
+	};
+
+	fixedregulator_5v0 {
+		regulator-max-microvolt = <0x4c4b40>;
+		regulator-always-on;
+		regulator-min-microvolt = <0x4c4b40>;
+		regulator-name = "5v0";
+		compatible = "regulator-fixed";
+	};
+
+	gpu: gpu {
+		compatible = "brcm,bcm2711-vc5";
+		status = "okay";
+		raspberrypi,firmware = <&firmware>;
+	};
+
+	aliases:	aliases {
+		/* serial5 = &uart5; */
+		/* vchiq = &vchiq_mailbox; */
+		vc4 = &gpu;
+	};
+
+	chosen:	chosen {
+		/* stdout-path = "serial5:115200n8"; */
+		stdout-path = "";
+		bootargs = "earlycon clk_ignore_unused cfg80211.ieee80211_regdom=PT ip=192.168.42.15 carrier_timeout=0"; // disable Ethernet for PX4
+	};
+
+	psci {
+		compatible = "arm,psci-0.2";
+		method = "smc";
+	};
+
+	cpus:	cpus {
+		#size-cells = <0x00>;
+		#address-cells = <0x01>;
+
+
+		cpu0:	cpu@0 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			status = "disabled"; // Marked as unused
+			reg = <0x00>;
+		};
+
+		cpu1:	cpu@1 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x01>;
+		};
+
+		cpu2:	cpu@2 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x02>;
+		};
+
+		cpu3:	cpu@3 {
+			compatible = "arm,armv8";
+			device_type = "cpu";
+			enable-method = "psci";
+			reg = <0x03>;
+		};
+	};
+
+	memory@14400000 {
+		device_type = "memory";
+		reg = <
+		0x00 0x14400000 0x27000000 // 624 MB
+		/* 0x01 0x00000000 0x80000000 // 2 GB */
+		>;
+	};
+
+	rmem: reserved-memory {
+		#address-cells = <0x02>;
+		#size-cells = <0x01>;
+		ranges;
+		cma_region: linux,cma {
+			linux,cma-default;
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x00 0x14400000 0x27000000>;
+			size = <0x18000000>;
+			reusable;
+		};
+	};
+	
+	clocks {
+
+		clk_osc:	clk-osc {
+			clock-output-names = "osc";
+			#clock-cells = <0x00>;
+			clock-frequency = <0x337f980>;
+			compatible = "fixed-clock";
+		};
+
+		clk_usb:	clk-usb {
+			clock-output-names = "otg";
+			#clock-cells = <0x00>;
+			clock-frequency = <0x1c9c3800>;
+			compatible = "fixed-clock";
+		};
+	};
+
+	clk_27MHz: clk-27M {
+		#clock-cells = <0x00>;
+		compatible = "fixed-clock";
+		clock-frequency = <0x19bfcc0>;
+		clock-output-names = "27MHz-clock";
+	};
+
+	clk_108MHz:	clk-108M {
+		#clock-cells = <0x00>;
+		compatible = "fixed-clock";
+		clock-frequency = <0x66ff300>;
+		clock-output-names = "108MHz-clock";
+	};
+
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <0x01 0x0d 0xf08 0x01 0x0e 0xf08 0x01 0x0b 0xf08 0x01 0x0a 0xf08>;
+	};
+
+	soc:	soc {
+		compatible = "simple-bus";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges = <
+		0x7e000000 0x00 0xfe000000 0x1800000 
+		0x7c000000 0x00 0xfc000000 0x2000000 
+		0x40000000 0x00 0xff800000 0x800000>;
+		dma-ranges = <
+		0xc0000000 0x00 0x00000000 0x40000000 
+		0x7c000000 0x00 0xfc000000 0x3800000>;
+
+
+		/**< ================ GIC ========== */
+		gicv2:	interrupt-controller@40041000 {
+			interrupts = <0x01 0x09 0xf04>;
+			compatible = "arm,gic-400";
+			#interrupt-cells = <0x03>;
+			reg = <0x40041000 0x1000 0x40042000 0x2000 0x40044000 0x2000 0x40046000 0x2000>;
+			interrupt-controller;
+		};
+
+		/**< ================ Power, firmware and mailbox ========== */
+		power: power {
+			compatible = "raspberrypi,bcm2835-power";
+			firmware = <&firmware>;
+			#power-domain-cells = <0x01>;
+		};
+
+		firmware:	firmware {
+			dma-ranges;
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			compatible = "raspberrypi,bcm2835-firmware\0simple-mfd";
+			mboxes = <&mailbox>;
+
+			expgpio:	gpio {
+				gpio-controller;
+				gpio-line-names = "BT_ON\0WL_ON\0PWR_LED_OFF\0GLOBAL_RESET\0VDD_SD_IO_SEL\0CAM_GPIO\0SD_PWR_ON\0SD_OC_N";
+				compatible = "raspberrypi,firmware-gpio";
+				status = "okay";
+				#gpio-cells = <0x02>;
+			};
+
+			reset:	reset {
+				#reset-cells = <0x01>;
+				compatible = "raspberrypi,firmware-reset";
+			};
+
+			firmware_clocks:	clocks {
+				#clock-cells = <0x01>;
+				compatible = "raspberrypi,firmware-clocks";
+			};
+
+			vcio:	vcio {
+				compatible = "raspberrypi,vcio";
+			};
+		};
+
+		mailbox:	mailbox@7e00b880 {
+			interrupts = <0x00 0x21 0x04>;
+			#mbox-cells = <0x00>;
+			compatible = "brcm,bcm2835-mbox";
+			reg = <0x7e00b880 0x40>;
+		};
+
+	};
+
+	scb:	scb@7c000000 {
+		compatible = "simple-bus";
+		#address-cells = <0x02>;
+		#size-cells = <0x02>;
+		dma-ranges = <0x00 0x00 0x00 0x00 0x04 0x00>;
+		ranges = <0x00 0x7c000000 0x00 0xfc000000 0x00 0x3800000 0x00 0x40000000 0x00 0xff800000 0x00 0x800000 0x06 0x00 0x06 0x00 0x00 0x40000000 0x00 0x00 0x00 0x00 0x00 0xfc000000>;
+
+		genet:	ethernet@7d580000 {
+			local-mac-address = [dc a6 32 a3 9c 57];
+			compatible = "brcm,bcm2711-genet-v5\0brcm,genet-v5";
+			reg = <0x00 0x7d580000 0x00 0x10000>;
+			#address-cells = <0x01>;
+			#size-cells = <0x01>;
+			interrupts = <0x00 0x9d 0x04 0x00 0x9e 0x04>;
+			status = "okay";
+			phy-handle = <&phy>;
+			phy-mode = "rgmii-rxid";
+
+			genet_mdio:	mdio@e14 {
+				compatible = "brcm,genet-mdio-v5";
+				reg = <0xe14 0x08>;
+				reg-names = "mdio";
+				#address-cells = <0x00>;
+				#size-cells = <0x01>;
+
+				phy:	ethernet-phy@1 {
+					reg = <0x01>;
+					led-modes = <0x00 0x08>;
+				};
+			};
+		};
+
+
+/**< USB camera */
+		pcie: pcie@7d500000 {
+			dma-ranges = <0x2000000 0x04 0x00 0x00 0x00 0x02 0x00>;
+			brcm,enable-ssc;
+			#address-cells = <0x03>;
+			interrupts = <0x00 0x93 0x04 0x00 0x94 0x04>;
+			interrupt-map = <0x00 0x00 0x00 0x01 0x01 0x00 0x8f 0x04 0x00 0x00 0x00 0x02 0x01 0x00 0x90 0x04 0x00 0x00 0x00 0x03 0x01 0x00 0x91 0x04 0x00 0x00 0x00 0x04 0x01 0x00 0x92 0x04>;
+			#size-cells = <0x02>;
+			msi-controller;
+			device_type = "pci";
+			interrupt-map-mask = <0x00 0x00 0x00 0x07>;
+			compatible = "brcm,bcm2711-pcie\0brcm,bcm7445-pcie";
+			ranges = <0x2000000 0x00 0xc0000000 0x06 0x00 0x00 0x40000000>;
+			#interrupt-cells = <0x01>;
+			interrupt-names = "pcie\0msi";
+			reg = <0x00 0x7d500000 0x00 0x9310>;
+			msi-parent = <&pcie>;
+
+			pci@0,0 {
+				#address-cells = <0x03>;
+				#size-cells = <0x02>;
+				device_type = "pci";
+				ranges;
+				reg = <0x00 0x00 0x00 0x00 0x00>;
+
+				usb@0,0 {
+					resets = <&reset 0x00>;
+					reg = <0x00 0x00 0x00 0x00 0x00>;
+				};
+			};
+		};
+	};
+
+};
