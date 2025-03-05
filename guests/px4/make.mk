@@ -20,6 +20,12 @@ PKG_DIR := $(buildroot_src)/package
 CONFIG_FILE := $(buildroot_src)/package/Config.in
 buildroot_host_pkgconf:=$(buildroot_src)/output/host/aarch64-buildroot-linux-gnu
 
+# Benchmark
+eval_guests_dir=$(bao_demos)/eval/guests
+eval_linux_dir=$(eval_guests_dir)/linux
+eval_interf_dir=$(eval_guests_dir)/interf
+mibench_src=$(eval_linux_dir)/mibench
+
 ########### Functions ##################
 define build-br-img
 br-img-$(strip $1) $(buildroot_img)-$(strip $1): | $(linux_src) $(buildroot_src) $(if $(strip $2), cam-apps)
@@ -33,9 +39,9 @@ ifeq ($(strip $(linux_patches)),)
 else
 	@$(call print_msg,>> Applying patches: $(linux_patches))
 # Check if the patch applies cleanly
-	@if git -C "$(linux_src)" apply --check "$(linux_patches)"; then \
+	@if git -C "$(linux_src)" apply --check $(linux_patches); then \
 		echo "Applying patch..."; \
-		git -C "$(linux_src)" apply "$(linux_patches)"; \
+		git -C "$(linux_src)" apply $(linux_patches); \
 	else \
 		echo "Patch does not apply cleanly. It might already be applied or conflict with the current code."; \
 	fi
@@ -46,6 +52,9 @@ endif
 	@$(call update-buildroot-cfg)
 	$(MAKE) -C $(buildroot_src) defconfig BR2_DEFCONFIG=$(buildroot_defcfg)
 #	@$(call wait_key)
+	@$(call print_msg,>> BUILDROOT: copy benchmarks)
+	@$(call cp-mibench)
+	@$(call cp-boot-test)
 	@$(call print_msg,>> BUILDROOT: reconfigure Linux kernel and build)
 	$(MAKE) -C $(buildroot_src) linux-reconfigure all
 	@$(call print_msg,>> BUILDROOT: copying image for backup...)
@@ -127,4 +136,64 @@ $(buildroot_src):
 clean-dtb:
 	-rm $(wrkdir_demo_imgs)/*.dtb
 
-.PHONY: cam-apps setup-cam-build install-cam-requirements copy-cam-packages add-cam-config
+
+define build-mibench
+	@echo "Mibench: Building..."
+	$(MAKE) -C $(mibench_src) ARCH=arm64 CROSS_COMPILE=$(buildroot_src)/output/host/bin/aarch64-linux-
+	@$(call cp-mibench)
+endef
+
+define build-boot-test
+	@echo "Boot test: building..."
+	@$(buildroot_src)/output/host/bin/aarch64-linux-gcc $(eval_linux_dir)/boot_test.c -o $(eval_linux_dir)/boot_test
+	@$(call cp-boot-test)
+endef
+
+define build-interf
+	@echo ">> Interf guest: cleaning..."
+	$(MAKE) -C $(eval_interf_dir) clean
+	@echo ">> Interf guest: building..."
+	$(MAKE) -C $(eval_interf_dir) PLATFORM=rpi4 CROSS_COMPILE=aarch64-none-elf-
+	@$(call cp-interf)
+endef
+
+define cp-mibench
+	@echo "Mibench: Copying files..."
+	@cp -r $(mibench_src) $(buildroot_dir)/rootfs_overlays/root/
+endef
+
+define cp-boot-test
+	@echo "Boot test: Copying..."
+	@cp -v $(eval_linux_dir)/boot_test $(buildroot_dir)/rootfs_overlays/root/
+endef
+
+define cp-interf
+	@echo "Interf guest: Copying..."
+	@cp -v $(eval_interf_dir)/build/rpi4/baremetal.bin $(wrkdir_plat_imgs)/$(DEMO)
+endef
+
+define test-bench-build
+	@echo "Benchmarks tools: building..."
+	mkdir -vp $(buildroot_dir)/rootfs_overlays/root/
+	mkdir -vp $(buildroot_dir)/rootfs_overlays/bin/
+	@$(call build-mibench)
+#	@$(call wait_key)
+	@$(call build-boot-test)
+endef
+
+test-bench:
+#	@$(call test-bench-build)
+#	@$(call cp-interf)
+#	ls $(wrkdir_plat_imgs)
+	@$(call build-interf)
+
+interf-build:
+	@$(call build-interf)
+
+
+# mibench-deploy:
+# 	@echo "Deploying mibench"
+# 	cp -r $(bao_demos)/eval/guests/linux/mibench 
+
+
+.PHONY: cam-apps setup-cam-build install-cam-requirements copy-cam-packages add-cam-config test-bench

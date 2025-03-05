@@ -162,9 +162,9 @@ clean: guests_clean bao_clean platform_clean
 
 distclean: clean-br-imgs
 	@$(call print_msg,Cleaning working directory...)
-	@if $(call confirm_action,Are you sure you want to remove WRKDIR; then \
+	@if $(call confirm_action,Are you sure you want to remove WRKDIR); then \
 		$(call print_msg,Proceeding with removal...); \
-		-@rm -rf $(wrkdir)
+		rm -rf $(wrkdir); \
 	else \
 		$(call print_msg,Aborted by the user.); \
 	fi

@@ -81,6 +81,20 @@
 		method = "smc";
 	};
 
+
+	arm-pmu {
+		/* compatible = "arm,cortex-a72-pmu\0arm,armv8-pmuv3\0arm,cortex-a7-pmu"; */
+		compatible = "arm,armv8-pmuv3";
+		interrupts = <
+		/* 0x00 0x10 0x04 */
+		0x00 0x11 0x04
+		0x00 0x12 0x04
+		0x00 0x13 0x04
+		>;
+		//interrupt-affinity = <0x39 0x3a 0x3b 0x3c>;
+		interrupt-affinity = <&cpu1 &cpu2 &cpu3>;
+	};
+
 	cpus:	cpus {
 		#size-cells = <0x00>;
 		#address-cells = <0x01>;
@@ -136,7 +150,7 @@
 			linux,cma-default;
 			compatible = "shared-dma-pool";
 			alloc-ranges = <0x00 0x14400000 0x27000000>;
-			size = <0x18000000>;
+			size = <0x18000000>; // 384 MB
 			reusable;
 		};
 	};

@@ -82,4 +82,4 @@ def calc_vm_mem_regions(bao_size_MB, px4_mem_size_MB):
     print(region)
 
 
-calc_vm_mem_regions(180, 152)
+calc_vm_mem_regions(188, 136)

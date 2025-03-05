@@ -8,10 +8,10 @@ _start:
     msr daifset, 0xf
 
     /* make sure mmu disable */
-//   mrs	x0, sctlr_el2
-//   mov x1, #1
-//   bic	x0, x0, x1
-//   msr	sctlr_el2, x0
+//    mrs	x0, sctlr_el2
+//    mov x1, #1
+//    bic	x0, x0, x1
+//    msr	sctlr_el2, x0
 
     /* make sure mmu disable */
     mrs	x0, sctlr_el1
